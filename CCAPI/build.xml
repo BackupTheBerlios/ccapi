@@ -38,6 +38,13 @@ CAUTION! Ignore warnings.
 		 classpath=".:/opt/j2sdk1.4.1_02/jre/lib/jsse.jar:libs/OpenAI.jar:libs/log4j.jar:libs/joone-engine.jar:libs/jfree.jar:${classpath}"
 		 nowarn="on"
 	/>
+	<javac 
+		 srcdir="src" 
+		 destdir="../5MinuteStarc"
+		 classpath=".:/opt/j2sdk1.4.1_02/jre/lib/jsse.jar:libs/OpenAI.jar:libs/log4j.jar:libs/joone-engine.jar:libs/jfree.jar:${classpath}"
+		 nowarn="on"
+	/>
+	
 	
 	<!-- package binary release. -->
 	<!-- The jar file is called 10_xyz for use with jboss. -->

@@ -967,10 +967,22 @@ public class FinancialLibrary {
      */
     public double tr(Vector candles, int skipdays) {
         double val = 0;
-        Candle c = (Candle) candles.elementAt(skipdays);
+        Candle c0 = (Candle) candles.elementAt(skipdays);
+	Candle c1 = (Candle) candles.elementAt(skipdays+1);
+	
+	double trueHigh = 0;
+	double trueLow = 0;
 
-        val = c.hi - c.low;
+	if(c0.hi > c1.close) trueHigh = c0.hi;
+	else trueHigh = c1.close;
 
+	if(c0.low < c1.close) trueLow = c0.low;
+	else trueLow = c1.close;
+	
+	
+        val = trueHigh - trueLow;
+
+	
         return val;
     }
 
@@ -1351,8 +1363,9 @@ public class FinancialLibrary {
 
     /**
      * returns the starc bands in a double array, val[0] lower starc band, val[3] upper starc band
-     * use val[1] + val[2] for the factor1 starc bands.
+     * use val[1] + val[2] for the factor1 starc bands. factor1 defines the band for the inner starc bands, factor2 defines the amout for the outer starc bands, 
      * good parameter settings are: v/20/14/2/3.
+     * 
      * @param v
      * @param closeAverage
      * @param truerangeAverage
@@ -1371,14 +1384,16 @@ public class FinancialLibrary {
 		}
 		atr/=(double)truerangeAverage;
 
+		System.out.println("atr: " + atr);
 
 		// calculate the moving average of the close price
 		double mav=SMA(closeAverage, v, skipdays);
 
+		System.out.println("mav: " + mav);
 		ret[0]=mav - (factor2*atr);
 		ret[1]=mav - (factor1*atr);
 		ret[2]=mav + (factor1*atr);
-		ret[3]=mav + (factor1*atr);
+		ret[3]=mav + (factor2*atr);
 
 		return ret;
 	}
