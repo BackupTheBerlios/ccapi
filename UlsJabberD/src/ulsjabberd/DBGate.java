@@ -178,6 +178,23 @@ public class DBGate {
 		return ret;
 	}
 	
+	/**
+	 * deleting a historic entry
+	 * @param chunk
+	 */
+	public void deleteHistoricEntry(Element chunk){
+		try{
+			// 
+			Statement stmt = connection.createStatement();
+			String statement = "delete from historicData where messageid="+chunk.storageID+";";
+			_logger.debug("Deleting historic entry with storageID "+chunk.storageID);
+			int i = stmt.executeUpdate(statement);
+			stmt.close();
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+	}
 	
 	/**
 	 * encodes to base 64 

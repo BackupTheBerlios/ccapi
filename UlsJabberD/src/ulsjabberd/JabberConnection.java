@@ -613,6 +613,8 @@ public class JabberConnection implements TagListener{
 		for(int i=0;i<offlineMessages.size();i++){
 			Element e1 = (Element)offlineMessages.elementAt(i);
 			this.send(e1.toString());
+			// now delete this specific entry
+			this.a.s.dbgate.deleteHistoricEntry(e1);
 		}
 	}
 	

@@ -16,7 +16,12 @@ import java.net.*;
 import java.io.*;
 import java.util.*;
 
+import org.apache.log4j.Logger;
+
 public class WebServer extends Thread{
+	
+	static Logger _logger = Logger.getLogger(WebServer.class);
+	
 	int port;
 	Starter s;
 	ServerSocket ss;
@@ -53,7 +58,7 @@ public class WebServer extends Thread{
 			
 			str.nextToken();
 			String url = str.nextToken();
-			System.out.println(url);
+			//System.out.println(url);
 			workOut(url, s);
 		}
 		catch(Exception e){
@@ -117,11 +122,8 @@ public class WebServer extends Thread{
 				ret += re.displayname+" / "+re.jid+" / " + re.subscription+"<br/>";
 			}
 		}
-		
-		
 		ret += ("</body>");
 		ret += ("</html>");
-		
 		return ret;
 	}
 }
