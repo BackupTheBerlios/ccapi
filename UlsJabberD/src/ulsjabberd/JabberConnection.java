@@ -1,8 +1,6 @@
 /*
  * Created on Mar 1, 2005
- *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
+ * 
  */
 package ulsjabberd;
 
@@ -46,6 +44,12 @@ public class JabberConnection implements TagListener{
 	String resource = ""; // holds the resource of this connection
 	
 	int priority = 0; // the priority of this connection 
+	
+	String primaryjid = "";
+	Vector secondaryjids = new Vector();
+	
+	int customerno = 0;
+	
 	
 	Accepter a;
 	/**
@@ -236,17 +240,25 @@ public class JabberConnection implements TagListener{
 							if(password != null){
 								// ok, 
 								String pwd = password.getText();
+								
+								// TODO: INSERT MAPPING BETWEEN alias@server to customerno
+								this.customerno=Integer.parseInt(username);
+								
 								// validate password. 
-								if(a.um.validatePwd(username, pwd)){
+								if(a.um.validatePwd(customerno, pwd)){
 									// ok, user valid, first retreive the auth id again. 
 									this.authid = e.getAttr("id");
 									// ok, user valid. send the welcome
 									sendPositiveAuthentication();
-									_logger.info("User "+username+" authenticated. ");
+									_logger.info("User "+customerno+" authenticated. ");
 									state = AUTHENTICATED;
+									
+									// need to obtain the secondary jids for this user
+									this.secondaryjids = a.um.getSecondaryJids(customerno);
+									
 								}
 								else{
-									sendError(2, "wrong pwd");
+									sendError((String)e.attributes.get("id"), "401", "Unauthorized");
 									breakConnection();
 								}
 							}
@@ -311,11 +323,16 @@ public class JabberConnection implements TagListener{
 	public void sendError(int code, String errortext){
 		_logger.debug("Error "+code + " / "+errortext);
 		try{
-			dout.writeChars("<error>");
+			dout.writeChars("<iq>");
 		}
 		catch(Exception e){
 			e.printStackTrace();
 		}
+	}
+	
+	public void sendError(String id, String code, String text){
+		_logger.debug("Sending error : "+id+"/"+code+"/"+text);
+		this.send("<iq type='error' id='"+id+"'><error code='"+code+"'>"+text+"</error></iq>");
 	}
 	
 	/**

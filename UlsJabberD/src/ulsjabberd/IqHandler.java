@@ -45,12 +45,14 @@ public class IqHandler implements TagHandler{
 	}
 	
 	public void sendRoster(){
+		Roster r = this.jc.a.um.getFullRoster(this.jc.username);
+		
 		String data = "<iq type='result' id='"+iq.getAttr("id")+"'>";
 		data += "<query xmlns='jabber:iq:roster'>";
-		data += "<item subscription='both' jid='uls@gmx.net'/>";
-		data += "<item subscription='both' jid='uls2@gmx.net'/>";
+		data += r.toXml();
 		data += "</query>";
 		data += "</iq>";
+		
 		jc.send(data);
 	}
 }

@@ -26,7 +26,7 @@ public class RosterEntry {
 		
 	}
 	
-	public String dumpToXml(){
+	public String toXml(){
 		String ret = "<item subscription='"+subscription+"' name='"+displayname+"' jid='"+jid+"'>";
 		for(int i=0;i<groups.size();i++){
 			String g = (String)groups.elementAt(i);
