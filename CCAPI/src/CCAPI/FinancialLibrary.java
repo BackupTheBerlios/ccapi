@@ -182,48 +182,9 @@ public class FinancialLibrary {
         Candle cref1 = (Candle) candles.elementAt(candles.size() - 1 -
                 skipdays - 1);
 
-        if (cref1.close > cref0.close) {
-            uptrend = true;
-        } else {
-            uptrend = false;
-        }
 
-        // find first extreme point.
-        boolean extremefound = false;
 
-        int index = 0;
-
-        while (!extremefound) {
-            cref0 = (Candle) candles.elementAt(candles.size() - 1 - skipdays -
-                    index);
-            cref1 = (Candle) candles.elementAt(candles.size() - 1 - skipdays -
-                    index - 1);
-
-            if (uptrend) {
-                if (cref1.close > cref0.close) {
-                } else {
-                    extremefound = true;
-
-                    break;
-                }
-            } else {
-                if (cref1.close < cref0.close) {
-                } else {
-                    extremefound = true;
-
-                    break;
-                }
-            }
-
-            index++;
-        }
-
-        if (cref1.close > cref0.close) {
-            uptrend = true;
-        } else {
-            uptrend = false;
-        }
-
+	
         double currentstop = 0.0;
         double previousstop = 0.0;
         double extreme = 0.0;
@@ -231,14 +192,6 @@ public class FinancialLibrary {
         double currentacc = af;
 	double sar = 0, nextSar = 0, sip, nextSip;
 
-        // set initial values
-        if (uptrend) {
-            extreme = cref0.close;
-	    
-	   
-        } else {
-            extreme = cref1.close;
-        }
 	sip = cref0.hi;
 	nextSar = cref0.low;
 	    
@@ -280,12 +233,15 @@ public class FinancialLibrary {
 				nextSar = minOf( cref0.low, cref1.low, nextSip + currentacc * (sip - nextSip ));
 			}
 			else{
-				sip = cref0.low;
-				currentacc = minOf( currentacc + af, max);
+				uptrend = false;
+				if(cref0.low<nextSip){
+					sip = cref0.low;
+					currentacc = minOf( currentacc + af, max);
+				}
+				nextSar = maxOf(cref0.hi, cref1.hi, sar + currentacc*(sip - sar));
 			}
-			nextSar = maxOf(cref0.hi, cref1.hi, sar + currentacc*(sip - sar));
 		}
-	
+		//System.out.println("SAR: "+nextSar + "     " + uptrend);	
  	}	
 
         // "Break - trend is at the start is in an up:" + uptrend);
@@ -304,19 +260,19 @@ public class FinancialLibrary {
     }
 
     public double minOf(double v1, double v2){
-		if(v1 >= v2 ) return v1;
-		if(v2 >= v1 ) return v2;
+		if(v1 <= v2 ) return v1;
+		if(v2 <= v1 ) return v2;
 		return v1;
     }
 
     public double minOf(double v1, double v2, double v3){
-		if(v1 >= v2 && v1 >= v3) return v1;
-		if(v2 >= v1 && v2 >=v3) return v2;
-		if(v3 >= v1 && v3 >=v2) return v3;
+		if(v1 <= v2 && v1 <= v3) return v1;
+		if(v2 <= v1 && v2 <=v3) return v2;
+		if(v3 <= v1 && v3 <=v2) return v3;
 		return v1;
     }
     /**
-     * returns the parabolic SAR - seems to be buggy
+     * returns the parabolic SAR direction
      *
      * @param n
      * @param candles
@@ -340,48 +296,9 @@ public class FinancialLibrary {
         Candle cref1 = (Candle) candles.elementAt(candles.size() - 1 -
                 skipdays - 1);
 
-        if (cref1.close > cref0.close) {
-            uptrend = true;
-        } else {
-            uptrend = false;
-        }
 
-        // find first extreme point.
-        boolean extremefound = false;
 
-        int index = 0;
-
-        while (!extremefound) {
-            cref0 = (Candle) candles.elementAt(candles.size() - 1 - skipdays -
-                    index);
-            cref1 = (Candle) candles.elementAt(candles.size() - 1 - skipdays -
-                    index - 1);
-
-            if (uptrend) {
-                if (cref1.close > cref0.close) {
-                } else {
-                    extremefound = true;
-
-                    break;
-                }
-            } else {
-                if (cref1.close < cref0.close) {
-                } else {
-                    extremefound = true;
-
-                    break;
-                }
-            }
-
-            index++;
-        }
-
-        if (cref1.close > cref0.close) {
-            uptrend = true;
-        } else {
-            uptrend = false;
-        }
-
+	
         double currentstop = 0.0;
         double previousstop = 0.0;
         double extreme = 0.0;
@@ -389,14 +306,6 @@ public class FinancialLibrary {
         double currentacc = af;
 	double sar = 0, nextSar = 0, sip, nextSip;
 
-        // set initial values
-        if (uptrend) {
-            extreme = cref0.close;
-	    
-	   
-        } else {
-            extreme = cref1.close;
-        }
 	sip = cref0.hi;
 	nextSar = cref0.low;
 	    
@@ -438,18 +347,22 @@ public class FinancialLibrary {
 				nextSar = minOf( cref0.low, cref1.low, nextSip + currentacc * (sip - nextSip ));
 			}
 			else{
-				sip = cref0.low;
-				currentacc = minOf( currentacc + af, max);
+				uptrend = false;
+				if(cref0.low<nextSip){
+					sip = cref0.low;
+					currentacc = minOf( currentacc + af, max);
+				}
+				nextSar = maxOf(cref0.hi, cref1.hi, sar + currentacc*(sip - sar));
 			}
-			nextSar = maxOf(cref0.hi, cref1.hi, sar + currentacc*(sip - sar));
 		}
-	
+		//System.out.println("SAR: "+nextSar + "     " + uptrend);	
  	}	
 
         // "Break - trend is at the start is in an up:" + uptrend);
         return uptrend;
     }
 
+   
     /**
      * returns the RSI
      *
