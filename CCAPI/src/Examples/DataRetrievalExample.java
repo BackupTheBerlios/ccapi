@@ -11,12 +11,12 @@ package Examples;
 
 import java.util.Vector;
 import CCAPI.*;
-import CCAPI.DataRetrieval.ConsorsQuoteRetriever;
+import CCAPI.DataRetrieval.ConsorsHistoryRetriever;
 
 public class DataRetrievalExample {
 
 	DataRetrievalExample(){
-		ConsorsQuoteRetriever cqr = new ConsorsQuoteRetriever();
+		ConsorsHistoryRetriever cqr = new ConsorsHistoryRetriever();
 		
 		// We need to obtain the isin through a plain search on the consors servers
 		// In this case we search for the official isin of the DAX WKN (846900)

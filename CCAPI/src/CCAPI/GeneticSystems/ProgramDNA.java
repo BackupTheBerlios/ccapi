@@ -385,12 +385,11 @@ public class ProgramDNA {
 			// text node 
 			ret += node.getNodeValue();
 		}
-		
 		return ret; 
 	}
 	
 	/**
-	 * problem is the mutation start. somehow the porgam must have a proper start.
+	 * problem is the mutation start. somehow the program must have a proper start.
 	 * if the program has a proper start 
 	 * 
 	 * @param args
@@ -401,7 +400,6 @@ public class ProgramDNA {
 		for(int i=0;i<10;i++){
 			pdna.entrydna = pdna.mutate(pdna.entrydna);
 		}
-		
 		System.out.println(pdna.dump(pdna.entrydna.getDocumentElement()));
 	}
 	

@@ -93,4 +93,12 @@ public class ComdirectQuoteRetriever {
 
         return ret;
     }
+    
+    public static void main(String[] args){
+    	//
+    	ComdirectQuoteRetriever cqr = new ComdirectQuoteRetriever();
+    	double[] ret = cqr.retrieveData("FDAX032005F.DTB");
+    	System.out.println(ret[0]+"/"+ret[1]);
+    	
+    }
 }

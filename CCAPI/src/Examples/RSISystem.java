@@ -11,13 +11,13 @@ package Examples;
 
 import java.util.*;
 import CCAPI.*;
-import CCAPI.DataRetrieval.ConsorsQuoteRetriever;
+import CCAPI.DataRetrieval.ConsorsHistoryRetriever;
 
 public class RSISystem {
 	
 	RSISystem(){
 		// doing a plain rsi system 
-		ConsorsQuoteRetriever cqr = new ConsorsQuoteRetriever();
+		ConsorsHistoryRetriever cqr = new ConsorsHistoryRetriever();
 		Vector data = cqr.getHistory(cqr.search("846900"));
 		
 		FinancialLibrary fl = new FinancialLibrary();
