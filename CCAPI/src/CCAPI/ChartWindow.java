@@ -445,26 +445,6 @@ public class ChartWindow extends JFrame {
 	}
 
 
-
-	//JTextArea scripttext;
-	/**
-	 * opens a very simple script editor
-	 *
-	 */
-	/*
-	public void editScript(){
-		String scr=script.getScript();
-		scripttext=new JTextArea();
-		scripttext.setText(scr);
-		JFrame f=new JFrame("Script editor - press set in chartwindow to set.");
-		f.setIconImage((new ImageIcon("script.jpg")).getImage());
-		f.getContentPane().add(new JScrollPane(scripttext), BorderLayout.CENTER);
-		f.setSize(300,400);
-		f.show();
-
-	}
-	*/
-
 	public static void main(String[] args){
 		ChartWindow cw=new ChartWindow("test");
 

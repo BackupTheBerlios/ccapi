@@ -1,7 +1,5 @@
 package CCAPI;
 
-/*--- formatted by Jindent 2.1, (www.c-lab.de/~jindent) ---*/
-
 import java.util.*;
 import java.io.*;
 /*import net.openai.ai.nn.architecture.*;
@@ -408,8 +406,7 @@ public class NeuralAnalyzer  implements NeuralNetListener{
 	//now i want to pipe one pattern into the net.
 	
 	analyzer.network.setLearning(false);
-
-
+	
 	DataSet data=new DataSet();
 	DataElement dataelement=new DataElement();
 	Vector v=new Vector();
@@ -445,6 +442,4 @@ public class NeuralAnalyzer  implements NeuralNetListener{
 }
 
 
-
-/*--- formatting done in "Sun Java Convention" style on 02-14-2002 ---*/
 	
