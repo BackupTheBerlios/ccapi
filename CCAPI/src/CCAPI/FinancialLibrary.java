@@ -1331,4 +1331,25 @@ public class FinancialLibrary {
 
         return ret;
     }
+
+	Vector normalizeVector(Vector input){
+		Vector ret=new Vector();
+			                                                                                                         
+		double min=min(input,0, input.size());
+		double max=max(input,0,input.size());
+				                                                                                                         
+		for(int i=0;i<input.size();i++){
+			Candle c=(Candle)input.elementAt(i);
+			ret.addElement(""+((c.close-min)/(max-min)));
+		}
+						                                                                                                         
+		return ret;
+							                                                                                                         
+	}
+	
+
+    
+
+
+	    
 }

@@ -221,7 +221,7 @@ public class NeuralAnalyzer  implements NeuralNetListener{
 	hidden.start();
 	output.start();
 	monitor.setTrainingPatterns(399); // # of rows (patterns) contained in the input file
-	monitor.setTotCicles(8000);            // How many times the net must be trained on the input patterns
+	monitor.setTotCicles(5000);            // How many times the net must be trained on the input patterns
 	monitor.setLearning(true);              // The net must be trained
 	monitor.Go();                                   // The net starts the training job
 																									       
@@ -272,13 +272,18 @@ public class NeuralAnalyzer  implements NeuralNetListener{
 	Vector data=ds.loadCSVFile("/home/us/84690020040805.csv");
 	System.out.println("candles loaded from disc: "+data.size());
 
-	int startpos=50;
-	int endpos=150;
+	int startpos=3;
+	int endpos=103;
+
+	double[] drawData=new double[101];
+	double[] drawData2=new double[101];
+	
+	Vector candles=new Vector();
 
 	
 	double[][] dataset=new double[100][20];
 //	for(int i=200;i<data.size()-100;i++){
-	for(int i=startpos;i<endpos;i++){
+	for(int i=endpos-1;i>=startpos;i--){
 	    db("\n");
 	    
 	    Vector v1=new Vector();
@@ -291,9 +296,12 @@ public class NeuralAnalyzer  implements NeuralNetListener{
 //		Candle c=(Candle)v1.elementAt(j-1);
     		dataset[i-startpos][j-1]=Double.parseDouble((String)v1.elementAt(j-1));
 	    }
+	   
 	    
 //	    System.out.println("Dataitems in input: "+inputData.size());
 	    Candle c0=(Candle)data.elementAt(i);
+	    candles.add(c0);
+	    
 	    db(c0.toString());
 	    Candle c1=(Candle)data.elementAt(i-1);
 	    Candle c2=(Candle)data.elementAt(i-2);
@@ -322,12 +330,27 @@ public class NeuralAnalyzer  implements NeuralNetListener{
 		
 			db("Put, waiting for get.");
 	        	  Pattern pattern = memOut.fwdGet();
-	        	  System.out.println("Output Pattern #"+(i+1-startpos)+" = "+pattern.getArray()[0]);
+			  double val=pattern.getArray()[0];
+	        	  System.out.println("Output Pattern #"+(i+1-startpos)+" = "+val);
+			  drawData2[i-startpos]=val;
 
 		}
 																		      						     	
 	}
+	
 
+
+	//draw routines
+	//
+	Vector normalizedCandles=normalizeVector(candles);
+	for(int k=0;k<normalizedCandles.size();k++){
+		drawData[k]=Double.parseDouble((String)normalizedCandles.elementAt(k));
+	}
+	
+	ChartWindow cw=new ChartWindow("test");
+	cw.draw(drawData);
+	cw.draw(drawData2);
+	
 	//draw that stuff.
     
     }
@@ -350,7 +373,7 @@ public class NeuralAnalyzer  implements NeuralNetListener{
 	//construct the network.
 	
 	
-	createNetwork(20,42,1);
+	createNetwork(20,7,1);
 	
 	train();
 	
