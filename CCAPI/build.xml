@@ -1,62 +1,32 @@
+<!-- CCAPI build file. author: us@activestocks.de -->
+<!-- protected by GPL -->
 <project default="deploy">
 <target name="deploy">
 
-	
+
+	<!-- compile to local bin folder -->
 	<javac 
-	    srcdir="src"
-	    destdir="bin"
-	>	
-	</javac>
+	     srcdir="src"
+	     destdir="bin"
+	/>	
 
-
+	<!-- compile to another project tree -->
 	<javac srcdir="src" destdir="../../GlobalMarketScreener/bin"/>
 
-
-	<jar destfile="/opt/jboss-3.2.3/server/default/deploy/10_CCAPI.jar" compress="false">
-		<fileset dir="bin">
-			
-		</fileset>
-	
+	<!-- package binary release. -->
+	<!-- The jar file is called 10_xyz for use with jboss. -->
+	<!-- jboss has a special deployment filter to organize load order. ..>
+	<jar destfile="10_CCAPI.jar" compress="false">
+		 <fileset dir="bin"/>
 	</jar>
 
-	
+	<!-- finally we zip the content of all folders and files for web -->
+	<!-- excluding my personal release script. -->
+	<zip 
+	     destfile="./ccapi-release.zip" 
+		 basedir="."
+		 excludes="release_batch.sh"
+	/>
 
-
-	<!-- CVS
-	
-	<cvs cvsRoot=":ext:staudinger@cvs.sourceforge.net:/cvsroot/redhorn"
-		command="co -m \"commiting from ant\"" />
-	-->
-</target>
-
-<target name="local">
-
-	
-	<javac 
-	    srcdir="src"
-	    destdir="bin"
-	>
-		
-
-		
-	</javac>
-
-
-	<javac srcdir="src" destdir="../../GlobalMarketScreener/bin"/>
-
-	<jar destfile="/home/us/192.168.40.120/jboss-3.2.3/server/default/deploy/10_CCAPI.jar" compress="false">
-		<fileset dir="bin">
-			
-		</fileset>
-	
-	</jar>
-
-	
-
-</target>
-
-<target name="web">
-	<javac srcdir="src" destdir="bin"/>
-		
 </target>
 </project>

@@ -1,0 +1,143 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <title>CCAPI</title>
+  <style type="text/css"> 
+h1{ font-family: Verdana; font-size: 18pt; } 
+h2{font-family: Verdana; font-size: 16pt; } 
+h3{ font-family: Verdana; font-size:14pt; } 
+p{ font-family: Verdana; font-size: 12pt; } 
+td{ font-family: Verdana;font-size: 12pt; }
+li{ font-family: Verdana;font-size: 12pt; }
+  </style>
+</head>
+<body>
+<table border="0" width="100%">
+  <tbody>
+    <tr>
+      <td bgcolor="#f0f0f0" colspan="3">
+      <h1>CCAPI - direct link api to consors' servers</h1>
+      </td>
+    </tr>
+    <tr>
+      <td bgcolor="#f0e0e0" width="33%"><a
+ href="http://www.activestocks.de">Forum</a></td>
+      <td bgcolor="#e0f0e0" width="33%"><a href="./doc/index.html">JavaDoc
+documentation</a></td>
+<td bgcolor="#E0E0F0">
+<a href="codeview.html">CodeView</a>
+</td>
+    </tr>
+  </tbody>
+</table>
+<p>
+<b>Disclaimer:</b><i> Der Benutzer dieser Quelltext-Dateien ist voll selbst
+verantwortlich f&uuml;r etwaige Sch&auml;den durch die Verwendung
+dieser Dateien. Der Autor dieser Quelltexte ist nicht verantwortlich
+f&uuml;r etwaige Sch&auml;den durch die Verwendung dieser Daten - z.b.
+durch direkten Kauf irgendwelcher Wertpapiere, o.&auml;.. Mit
+Verwendung dieser Texte erkennt der Nutzer die Nichtverantwortlichkeit
+des Autors an. Der Autor geht davon aus, dass der Benutzer dieser Texte weiss was er tut!</i>
+</p>
+<p><i>Wichtiger Hinweis: Keinen Unfug mit den Consors Servern machen!!! Ich brauche die Dinger noch, schliesslich muss ich damit handeln!</i></p>
+<h2>&Uuml;bersicht</h2>
+<p>
+Dies ist die offizielle Seite der CCAPI. CCAPI ist eine
+Programmierbibliothek geschrieben in Java. Eckpunkte der CCAPI:
+</p>
+<ul>
+  <li>JDK1.4.x+ wird ben&ouml;tigt</li>
+    <li>ist eine Bibliothek um direkt auf die Consors Server zuzugreifen</li>
+      <li>Consors Konto ist Vorraussetzung</li>
+        <li>Mitarbeit und Verbesserungcode willkommen und ausdr&uuml;cklich erw&uuml;nscht</li>
+  <li>OpenSource, kein closed source, LGPL Lizenz gilt</li>
+  <li>Quelltext leicht und verst&auml;ndlich geschreiben, einfach
+nachzuvollziehen</li>
+  <li>eignet sich zur Erstellung eigener automatischer Handelssysteme</li>
+  <li>braucht keinen laufenden ActiveTrader - also doppelt Vorsicht beim
+automatischen Handeln!</li>
+</ul>
+<h2>Lizenz</h2>
+<p>Diese Software wird unter der LGPL entwickelt. Kinnas, das ist eine
+echt lockere Lizenz, also locker bleiben!</p>
+<h2>Download</h2>
+<p>
+Download Link direkt von diesem Server, mit dem aktiven Download
+erkennen Sie den Disclaimer und das Lizenzmodell an: <a
+ href="ccapi.zip">ccapi.zip</a>
+</p>
+<h2>Kompilieren mit JDK1.4.x+</h2>
+<p>
+Die einzige Kleinigkeit die man beim Kompilieren beachten muss ist, die Datei jsse.jar eventuell explizit in den Classpath zu legen. jsse.jar wird mit 
+jeder JDK Version h?her als 1.4.x mitgeliefert, nur ist die Datei nicht auf allen Rechnern im Classpath eingebunden. Bei mir liegt die Datei in /usr/lib/j2sdk1.4.2_03/jre/lib/jsse.jar . 
+Ausserdem muss javax.xml.* im Path liegen, diese Klassen liegen in rt.jar. Also:
+</p>
+<p>Kompilieren mit:<br>
+us@uls_ibm:~/workspace/CCAPI$ javac -classpath /usr/lib/j2sdk1.4.2_03/jre/lib/jsse.jar:/usr/lib/j2sdk1.4.2_03/jre/lib/rt.jar:$CLASSPATH:. CCAPI/*.java<br>
+us@uls_ibm:~/workspace/CCAPI$</p>
+
+<h2>Beispielszenario</h2>
+<p>Hier ein kleines Beispielszenario wie ich die API einsetze:</p>
+<p>Auf einem Server in den Staaten (in Seattle um genau zu sein)
+l&auml;uft auf meinem shell account eines meiner Programme. Das
+Programm beinhaltet die CCAPI. In regelm&auml;&szlig;igen
+Abst&auml;nden (alle sechs Sekunden) wird der Dax Stand &uuml;ber
+Consors und der Euro Stand &uuml;ber einen Comdirect-Seiten-Parser
+abgerufen. Eine h&ouml;here Systemaufl&ouml;sung ist absolut
+unn&ouml;tig - zumal selbst die Consors Quotes nur eine 15 Sekunden
+Samplingrate haben.</p>
+<p>Die anfallende Datenmenge w&auml;re viel zu gro&szlig; um sie
+ungefiltert zu speichern. Deswegen werden drei Arten Candles produziert
+- 3 Minuten, 10 Minuten und 60 Minuten, immer zu vollen Einheiten, also
+beispielsweise um 11:00, 11:03, 11:06....11:10... 11:15... werden diese
+Kerzen gespeichert. </p>
+<p>Die gesammelten Daten flie&szlig;en in eine MySQL-Datenbank mit
+mehreren Tabellen f&uuml;r jede Kerzenart. Piece of cake sozusagen.</p>
+<p>Die Datenmenge ist beachtlich. Pro Tag fallen ca. 2 MB Daten an, MySQL
+wird bei solchen Datenmengen irgendwann merklich speicherhungrig.</p>
+<p>Direkt nach dem Speichern der Daten werden die Daten live ausgewertet,
+dazu verwende ich die in der FinancialLibrary Klasse implementierten
+Routinen. Ehrlich gesagt ist Durchschnittstraden ziemlicher schrott -
+oder ich habe die richtigen Durchschnitte noch nicht gefunden ....
+jedenfalls ist das meine Erfahrung. </p>
+<p>
+Da ich aktiv bei jabber.org dabei bin und mit dem IM System (Instant
+Messaging) viele gute Erfahrungen gemacht habe (Gr&uuml;&szlig;e an
+dieser Stelle an <a href="http://www.sharewatch.com">sharewatch.com</a>!)
+schickt mir mein kleines System automatisch Handelssignale als IM auf
+meinen Jabber account uls@jabber.org. </p>
+<p>
+Manchmal funktionierts ganz gut, mein System, in Seitw&auml;rtsphasen
+produzierts aber immer Verlust. </p>
+<p>Was vielleicht interressant w&auml;re, Strippen und Strappen und Straddeln mit automatischer OS Selektion einzubauen ... nur ob das was bringt... </p>
+<p>
+Hier noch ein kleines Systemdiagram:</p>
+<img src="Collaboration.gif">
+<h2>Verwendungshinweise</h2>
+<p>
+Die zentrale Klasse der Bibliothek ist die ConsorsConnection-Klasse. Diese Klasse kann sowohl als Standalone aufgerufen werden (sie hat ein static 
+void main()) oder eingebunden werden in ein anderes Programm.
+</p>
+<p>
+Die Klassen ComdirectRetriever und EuwaxRetriever sind eigentlich relativ unabh?ngig von der ConsorsConnection Klasse. Ich habe die Dateien 
+der Vollst&auml;ndigkeit halber in die CCAPI gepackt. Verwendung ist ganz einfach: Instantieren und mit retrieveData(wkn) die relevanten Daten holen. 
+Zu beachten ist, dass bei den beiden Klassen nicht die eigentliche WKN sondern die Provider spezifische Bezeichnung verwendet werden muss, also bspw. EURUSD.ETR 
+f&uuml;r den euro/dollar Kurs bei comdirect. 
+</p>
+<h2>Support</h2>
+<p>
+Ich pers&ouml;nlich empfehle das <a href="http://www.activestocks.de">Forum</a>!
+</p>
+<table width="100%">
+  <tbody>
+    <tr>
+      <td align="right">website (c) 2003-2004 Ulrich Staudinger - letzte aktualisierung am 19.4.2004</td>
+    </tr>
+    <tr>
+      <td align="right">Kontaktinformationen: <a
+ href="mailto:us@activestocks.de">us@activestocks.de</a></td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>
