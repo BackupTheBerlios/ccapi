@@ -29,6 +29,7 @@ public class ConsorsQuoteRetriever {
 			URL url = new URL(
 					"http://info.consors.de/financeinfos/snapshot.do?ID_NAME=ID_OSI&ID="
 							+ consorsid);
+			System.out.println("Using url : "+url.toExternalForm());
 			// InputStream is=url.openStream();
 			DataInputStream din = new DataInputStream(new BufferedInputStream(
 					url.openStream()));
@@ -41,9 +42,13 @@ public class ConsorsQuoteRetriever {
 			boolean quotes = false;
 
 			while (l != null) {
-				if (debug)System.out.println("ConsorsQuoteRetriever READ: " +l);
+				//if (debug)System.out.println("ConsorsQuoteRetriever READ: " +l);
 
-				if (l.indexOf("<td valign=\"middle\" class=\"h1\" align=\"center\"><font color=\"#008000\"><strong>") != -1) {
+				if (l.indexOf("<td valign=\"middle\" class=\"h1\" align=\"center\"><font color=\"#008000\"><strong>") != -1  || 
+					l.indexOf("<td valign=\"middle\" class=\"h1\" align=\"center\"><font color=\"#FF0000\"><strong>") != -1  ||
+					l.indexOf("<td valign=\"middle\" class=\"h1\" align=\"center\"><font ><strong>") != -1
+					
+					) {
 					
 					// work out the value
 					l = l.substring(l.indexOf("<strong>")+8, l.indexOf("</strong>"));

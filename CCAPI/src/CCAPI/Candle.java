@@ -23,7 +23,7 @@ public class Candle implements Serializable {
     public String fullname = "";
     public String datestring = "";
     public String wkn = "";
-    public Date date = null;
+    public Date date = new Date();
 
     public Candle() {
     }
