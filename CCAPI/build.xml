@@ -24,18 +24,20 @@ CAUTION! Ignore warnings.
 	<javac 
 	     srcdir="src"
 	     destdir="bin"
-		 classpath="/opt/j2sdk1.4.1_02/jre/lib/jsse.jar"
+		 classpath="/opt/j2sdk1.4.1_02/jre/lib/jsse.jar:libs/OpenAI.jar:libs/log4j.jar"
 		 nowarn="on"	
 	/>	
 
 	<!-- compile to another project tree -->
+
+	<!--
 	<javac 
 		 srcdir="src" 
 		 destdir="../../GlobalMarketScreener/bin"
-		 classpath="/opt/j2sdk1.4.1_02/jre/lib/jsse.jar"	
+		 classpath="/opt/j2sdk1.4.1_02/jre/lib/jsse.jar:libs/OpenAI.jar:libs/log4j.jar"	
 		 nowarn="on"
 	/>
-
+	-->
 	<!-- package binary release. -->
 	<!-- The jar file is called 10_xyz for use with jboss. -->
 	<!-- jboss has a special deployment filter to organize load order. -->
