@@ -10,7 +10,7 @@ import java.net.URL;
  *
  */
 public class EuwaxQuoteRetriever {
-    EuwaxQuoteRetriever() {
+    public EuwaxQuoteRetriever() {
     }
 
     public double[] retreiveQuote(String wkn) {
