@@ -13,10 +13,15 @@ package ulsjabberd;
  */
 import org.apache.log4j.Logger;
 import java.util.Vector;
+import java.text.SimpleDateFormat;
 import ulsjabberd.xml.Element;
+import java.util.Date;
 
 public class XmlRouter {
 
+	SimpleDateFormat sdf1 = new SimpleDateFormat("yyyyMMdd");
+	SimpleDateFormat sdf2 = new SimpleDateFormat("HH:mm:ss");
+	
 	static Logger _logger = Logger.getLogger(XmlRouter.class);
 	Accepter a; 
 	XmlRouter(Accepter a){
@@ -46,10 +51,19 @@ public class XmlRouter {
 				
 				JabberConnection targetConnection = a.getConnection(truncatedTo, resource);
 				if(targetConnection!=null){
+					_logger.debug("Sending message to target. ");
 					targetConnection.send(chunk.toString());
 				}
 				else{
-					_logger.debug("No local target connection found. ");
+					_logger.debug("No local target connection found. Storing in database");
+					chunk.addAttr("to", truncatedTo);
+					// need to add a timestamp to the chunk
+					Element x = new Element("x");
+					x.addAttr("from", chunk.getAttr("from"));
+					x.addAttr("xmlns", "jabber:x:delay");
+					x.addAttr("stamp", sdf1.format(new Date())+"T"+sdf2.format(new Date()) );
+					chunk.addElement(x);
+					this.a.s.dbgate.storeHistoricEntry(chunk);
 				}
 				
 				
@@ -60,6 +74,9 @@ public class XmlRouter {
 			e.printStackTrace();
 		}
 	}
+	
+	
+	
 	
 	Vector getAllLocalJabberConnections(String jid){
 		Vector ret = new Vector();

@@ -24,7 +24,7 @@ public class Roster {
 	/**
 	 * holds the username for which user this roster may be used
 	 */
-	String username = "";  
+	int customerno;  
 	
 	/**
 	 * some rpc function calls
@@ -45,7 +45,7 @@ public class Roster {
 		// actually loading the roster from somewhere ( i.e. database )
 		// for now: gmxrpc
 		try{
-			rpcLoadContacts.setParam("customerno","23216823");
+			rpcLoadContacts.setParam("customerno",customerno);
 			rpcLoadContacts.setParam("request","getaddressbycategory");
 			rpcLoadContacts.setParam("address_items","address_id,nickname,firstname,lastname,email");
 			rpcLoadContacts.setParam("address_record_items","standard_email,email");

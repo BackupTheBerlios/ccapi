@@ -107,14 +107,14 @@ public class UserManager {
 	 * @param username
 	 * @return 
 	 */
-	public Roster getFullRoster(String username){
+	public Roster getFullRoster(int customerno){
 		/*for(int i=0;i<rosters.size();i++){
 			Roster r=(Roster)rosters.elementAt(i);
 			if(r.username.equals(username))return r;
 		}*/
 		// ok, still in here, need to obtain a new roster
 		Roster ret = new Roster();
-		ret.username=username;
+		ret.customerno = customerno;
 		ret.load();
 		rosters.add(ret);
 		return ret; 
@@ -137,14 +137,14 @@ public class UserManager {
 	 * @param username
 	 * @return
 	 */
-	public Vector getOnlineRoster(String username){
+	public Vector getOnlineRoster(int customerno){
 		Vector ret = new Vector();
 		for(int i=0;i<rosters.size();i++){
 			Roster r=(Roster)rosters.elementAt(i);
-			if(r.username.equals(username)){
+			if(r.customerno == customerno){
 				// check if each contact is online or not. 
 				
-				_logger.debug("Dumping out full roster for "+username);
+				_logger.debug("Dumping out full roster for "+customerno);
 				dumpVector(r.entries);
 				
 				// TODO: REALLY IMPLEMENT A BETTER SEARCH ALGORITHM
@@ -152,7 +152,7 @@ public class UserManager {
 					RosterEntry re = (RosterEntry)r.entries.elementAt(j);
 					if(isOnline(re.jid))ret.add(re.jid);
 				}
-				_logger.debug("Dumping out online roster for "+username);
+				_logger.debug("Dumping out online roster for "+customerno);
 				dumpVector(ret);
 				return ret;
 			}

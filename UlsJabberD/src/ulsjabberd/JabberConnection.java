@@ -44,7 +44,7 @@ public class JabberConnection implements TagListener{
 	String resource = ""; // holds the resource of this connection
 	
 	int priority = 0; // the priority of this connection 
-	String presenceShow, presenceStatus;
+	String presenceShow, presenceStatus, presenceType;
 	
 	/**
 	 * @return Returns the presenceShow.
@@ -297,6 +297,9 @@ public class JabberConnection implements TagListener{
 									// need to obtain the secondary jids for this user
 									this.secondaryjids = a.um.getSecondaryJids(customerno);
 									this.primaryjid = fulladdress;
+								
+								
+								
 								}
 								else{
 									sendError((String)e.attributes.get("id"), "401", "Unauthorized");
@@ -522,4 +525,70 @@ public class JabberConnection implements TagListener{
 	}
 	
 
+	/**
+	 * @return Returns the presenceType.
+	 */
+	public String getPresenceType() {
+		return presenceType;
+	}
+	
+	/**
+	 * @param presenceType The presenceType to set.
+	 */
+	public void setPresenceType(String presenceType) {
+		this.presenceType = presenceType;
+	}
+	
+	/**
+	 * sending a presence 
+	 * @param to
+	 * @param type
+	 * @param show
+	 * @param status
+	 */
+	void sendPresence(String from, String type, String show, String status){
+		// actually send some data 
+		String data = "<presence from='"+from+"'>";
+		if(!show.equals(""))data+="<show>"+show+"</show>";
+		if(!status.equals(""))data+="<status>"+show+"</status>";
+		data += "</presence>";
+		send(data);
+	}
+
+	/**
+	 * function to send online buddys
+	 *
+	 */
+	void sendOnlineBuddys(){
+		// need to send the online status of all buddys
+		Vector v = this.a.um.getOnlineRoster(customerno);
+		for(int i=0;i<v.size();i++){
+			String jid = (String)v.elementAt(i);
+			JabberConnection jc = a.getConnection(jid, "");
+			
+			// 
+			if(jc.getPresenceType().equals("available")){
+				sendPresence(jc.primaryjid, jc.getPresenceType(), jc.getPresenceShow(), jc.getPresenceStatus());
+			}
+		}
+	}
+	
+	/**
+	 * sending offline messages
+	 *
+	 */
+	void sendOfflineMessages(){
+		
+		_logger.info(customerno+": Sending offline messages");
+		// need to check for stored messages
+		Vector offlineMessages = this.a.s.dbgate.obtainHistoricEntrys(primaryjid);
+		for(int i=0;i<secondaryjids.size();i++){
+			offlineMessages.addAll(a.s.dbgate.obtainHistoricEntrys((String)secondaryjids.elementAt(i)));
+		}
+		_logger.info(customerno+": obtained messages: "+offlineMessages.size());
+		for(int i=0;i<offlineMessages.size();i++){
+			Element e1 = (Element)offlineMessages.elementAt(i);
+			this.send(e1.toString());
+		}
+	}
 }

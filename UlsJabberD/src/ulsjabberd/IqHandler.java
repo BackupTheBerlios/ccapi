@@ -38,11 +38,15 @@ public class IqHandler implements TagHandler{
 				_logger.debug("Working out roster get");
 				// roster requested.
 				sendRoster();
+				// need to send online buddys
+				jc.sendOnlineBuddys();
+				// may send offline messages
+				jc.sendOfflineMessages();
 			}
 			else if(xmlns.equals("jabber:iq:roster") && iq.getAttr("type").equals("set")){
 				// adding user to jid requested
 				_logger.debug("Working out roster set");
-				Roster r = this.jc.a.um.getFullRoster(this.jc.username);
+				Roster r = this.jc.a.um.getFullRoster(jc.customerno);
 				String jid = iq.getElement("query").getElement("item").getAttr("jid");
 				String name = iq.getElement("query").getElement("item").getAttr("name");
 				if(jid!=null){
@@ -74,7 +78,7 @@ public class IqHandler implements TagHandler{
 	}
 	
 	public void sendRoster(){
-		Roster r = this.jc.a.um.getFullRoster(this.jc.username);
+		Roster r = this.jc.a.um.getFullRoster(jc.customerno);
 		
 		String data = "<iq type='result' id='"+iq.getAttr("id")+"'>";
 		data += "<query xmlns='jabber:iq:roster'>";

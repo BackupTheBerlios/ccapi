@@ -45,14 +45,14 @@ public class Starter {
 			
 			// initialize the database
 			dbgate = new DBGate();
-			
+			dbgate.initialize();
 			// ok,init done. open the Accepter
 			a=new Accepter(this);
 			a.start();
 			// done with accepting. 
 		}
 		catch(Exception e){
-			_logger.fatal("Properties not found.");
+			_logger.fatal(e);
 		}
 	}
 	

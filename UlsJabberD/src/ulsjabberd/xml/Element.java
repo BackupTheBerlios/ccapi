@@ -17,7 +17,7 @@ public class Element implements TagListener{
 	 */
 	public long storageID = -1;
 
-	Element(){
+	public Element(){
 		attributes=new PHashtable();
 		elements=new Vector();
 	}
@@ -27,7 +27,7 @@ public class Element implements TagListener{
 	    return false;
 	}
 
-	Element(String name){
+	public Element(String name){
 		this.name=name;
 		attributes=new PHashtable();
 		elements=new Vector();
