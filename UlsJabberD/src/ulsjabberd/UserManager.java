@@ -56,7 +56,6 @@ public class UserManager {
 		return ret; 
 	}
 	
-	
 }
 
 

@@ -83,14 +83,20 @@ public class DBGate {
 	 */
 	public void initialize(){
 		try {
+			
+			// initializing the onlineMappings
 			Statement stmt = connection.createStatement();
-			String statement = "drop table if exists roster;";
+			String statement = "drop table if exists onlineMappings;";
 			stmt = connection.createStatement();
 			int i = stmt.executeUpdate(statement);
 			statement =
-				"CREATE table roster (jid varchar(255), type varchar(255), price_buy float, date_buy varchar(255), price_sell float, date_sell varchar(255), stoplevel float, change_percent float, change_net float , cash float);";
+				"CREATE table onlineMappings (jid varchar(255), resource varchar(255), server varchar(255));";
 			i = stmt.executeUpdate(statement);
 			if(stmt!=null)stmt.close();
+	
+			
+			
+			
 		}
 		catch(Exception e){
 			e.printStackTrace();

@@ -8,9 +8,6 @@ package ulsjabberd;
 
 /**
  * @author us
- *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
  */
 
 import ulsjabberd.xml.Element;
