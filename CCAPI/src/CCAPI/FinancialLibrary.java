@@ -1363,7 +1363,7 @@ public class FinancialLibrary {
     public double[] starc(Vector v, int closeAverage, int truerangeAverage, double factor1, double factor2, int skipdays){
 		double[] ret = new double[4];
 
-		double atr;
+		double atr = 0;
 		// calculate the average of the true range for a couple of days.
 		for(int i=0;i<truerangeAverage;i++){
 			//
