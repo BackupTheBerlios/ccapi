@@ -24,7 +24,7 @@ public class ConsorsQuoteRetriever {
 
 	}
 
-	double getQuote(String consorsid) {
+	public double getQuote(String consorsid) {
 		try {
 			URL url = new URL(
 					"http://info.consors.de/financeinfos/snapshot.do?ID_NAME=ID_OSI&ID="
@@ -41,8 +41,7 @@ public class ConsorsQuoteRetriever {
 			boolean quotes = false;
 
 			while (l != null) {
-				//if (debug)System.out.println("ConsorsQuoteRetriever READ: " +
-				// l);
+				if (debug)System.out.println("ConsorsQuoteRetriever READ: " +l);
 
 				if (l.indexOf("<td valign=\"middle\" class=\"h1\" align=\"center\"><font color=\"#008000\"><strong>") != -1) {
 					
