@@ -7,6 +7,9 @@ import org.htmlparser.util.*;
 import org.htmlparser.visitors.*;
 import org.htmlparser.tags.*;
 
+/**
+ * obtains the bnp paribas options from the european stock exchange
+ */
 
 public class OSGetterEuwax{
 
@@ -14,7 +17,7 @@ public class OSGetterEuwax{
 		
 
 		try{
-			Parser p=new Parser("http://www.euwax.de/finder/mta_finder/fnd_build_mta.php?wp_keyword=&fnd_typ=alle&region_basiswert=alle&basiswert=alle&optionsart="+type+"&basispreis_ab=&basispreis_bis=&ko_schwelle_ab="+from+"&ko_schwelle_bis="+to+"&lauf_ab=&lauf_bis=&fndr_sel=kop&sort_me=&asc_desc=&nln_min=&nln_max=&special_sel=&back_url=%2Fprod_ko%2Fknockout.htm&back_target=_self&go.x=0&go.y=0");
+			Parser p=new Parser("http://www.euwax.de/finder/mta_finder/fnd_build_mta.php?wp_keyword=&fnd_typ=alle&region_basiswert=alle&basiswert=alle&optionsart="+type+"&basispreis_ab=&basispreis_bis=&ko_schwelle_ab="+from+"&ko_schwelle_bis="+to+"&lauf_ab=&lauf_bis=&emittent%5B1%5D=bnp&fndr_sel=kop&sort_me=&asc_desc=&nln_min=&nln_max=&special_sel=&back_url=%2Fprod_ko%2Fknockout.htm&back_target=_self&go.x=0&go.y=0");
 			Node nodes[] = p.extractAllNodesThatAre(TableTag.class);
 		
 			
