@@ -40,7 +40,9 @@ import org.joone.io.*;
 public class NeuralAnalyzer  implements NeuralNetListener{
 
 	
-
+	DatabaseLayer dbl = new DatabaseLayer();
+	
+	
     // our handle to the network
     FinancialLibrary fl=new FinancialLibrary();
     
@@ -151,7 +153,7 @@ public class NeuralAnalyzer  implements NeuralNetListener{
 	
 	//populate the data set
 	FileDataSourceCSV ds=new FileDataSourceCSV();
-	Vector data=ds.loadCSVFile("/home/us/84690020040805.csv");
+	Vector data = dbl.loadHistory("846900", 0);
 	System.out.println("candles loaded from disc: "+data.size());
 	
 	double[][] dataset=new double[400][21];
@@ -388,48 +390,7 @@ public class NeuralAnalyzer  implements NeuralNetListener{
      * @see
      */
     public static void main(String[] args) {
-
-	NeuralAnalyzer analyzer = new NeuralAnalyzer("abcd");
-/*
-	analyzer.createNetwork(i,h,o);
-	analyzer.setNetworkAlgorithms();
-
-
-
-	//function to train the network! 
-
-	analyzer.train(0.1);
-
-	//now i want to pipe one pattern into the net.
-	
-	analyzer.network.setLearning(false);
-	
-	DataSet data=new DataSet();
-	DataElement dataelement=new DataElement();
-	Vector v=new Vector();
-	v.addElement(""+0.1);
-	v.addElement(""+0.0);
-	dataelement.setInput(v);	
-	Vector v1=new Vector();
-//	v1.add(""+0.0);
-	
-	dataelement.setDesired(v1);
-	data.addElement(dataelement);
-	
-	
-	analyzer.network.setDataSet(data);	
-	try{
-        	analyzer.network.iterateNetwork();
-		
-	}
-	catch(Exception e){
-	    e.printStackTrace();
-	}
-
-	Layer out=analyzer.network.getOutputLayer();
-
-	System.out.println("out:"+out.toString());
-*/
+    	NeuralAnalyzer analyzer = new NeuralAnalyzer("abcd");
     } 
 
     private static void db(String s) {

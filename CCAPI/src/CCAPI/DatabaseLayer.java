@@ -1406,5 +1406,65 @@ public class DatabaseLayer {
 			e.printStackTrace();
 		}
 	}
+	
+	
+	
+    public Vector loadHistory(String wkn, int skipdays) {
+        Vector ret = new Vector();
+        Vector t=new Vector();
+        
+        System.out.println("StockSymbolEntityBean: Loading from database");
+        try {
+            Connection con = DriverManager.getConnection("jdbc:mysql://192.168.40.122:3306/test?user=root&password=root");
+            //create the statement
+            Statement stmt = con.createStatement();
+            try {
+                //first check if we have a timestamp already
+                String query="select * from symboldata where wkn='"+(wkn)+"' order by timestamp;";
+                System.out.println(query);
+                ResultSet rs = stmt
+                        .executeQuery(query);
+
+                if(rs!=null){
+                    while (rs.next()) {
+                        //System.out.println("Adding a candle.");
+                        Candle c = new Candle();
+                        c.isin = rs.getString(1);
+                        c.datestring = rs.getString(2);
+                        c.open = rs.getDouble(3);
+                        c.hi = rs.getDouble(4);
+                        c.low = rs.getDouble(5);
+                        c.close = rs.getDouble(6);
+                        c.volume = rs.getInt(7);
+                        c.wkn = rs.getString(8);
+                        t.add(c);
+                    }
+                }
+                else{
+                    System.out.println("rs == null");
+                }
+                for(int i=0;i<t.size();i++){
+                    ret.add( (Candle)t.elementAt(t.size()-1-i-skipdays));
+                }
+
+                if(ret.size()>0){
+                    System.out.println( ((Candle)ret.elementAt(0)).toString() ) ;
+                }
+
+            } catch (Exception e) {
+                System.out.println("Inner try catch");
+                e.printStackTrace();
+            }
+            
+            con.close();
+            
+        } catch (Exception e) {
+            System.out.println("Outer try catch");
+            e.printStackTrace();
+        }
+        System.out.println("StockSymbolEntityBean: Loaded from database: "+ret.size()+" candles.");
+        return ret;
+    }
+
 
 }
