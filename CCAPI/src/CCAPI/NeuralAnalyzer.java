@@ -22,6 +22,17 @@ import org.joone.engine.*;
 import org.joone.engine.learning.*;
 import org.joone.io.*;
 
+/***
+ *	good parameter settings.
+ *	l:0.9 m:0.5  	20/3/1
+ *			20/42/1
+ *
+ *
+ *
+ *
+ *
+ *
+ * */
 
 
 
@@ -49,10 +60,9 @@ public class NeuralAnalyzer  implements NeuralNetListener{
      public void cicleTerminated(NeuralNetEvent e) {
 	 Monitor mon = (Monitor) e.getSource();
 	 long    c = mon.getCurrentCicle();
-	 long    cl = c / 1000;
 	                                                                                                                                                                 
 	 // We want to print the results every 1000 cycles
-	 if ((cl * 1000) == c) {
+	 if (c%100  == 0) {
 	     System.out.println(c + " cycles remaining - Error = " + mon.getGlobalError());
 	 }
      }
@@ -121,8 +131,8 @@ public class NeuralAnalyzer  implements NeuralNetListener{
 	// Create the Monitor object and set the learning parameters
 	monitor = new Monitor();
 	                                                                                                                                
-	monitor.setLearningRate(0.8);
-	monitor.setMomentum(0.3);
+	monitor.setLearningRate(0.9);
+	monitor.setMomentum(0.5);
 	                                                                                                                                                
 	// Passe the Monitor to all components
 	input.setMonitor(monitor);
@@ -149,9 +159,13 @@ public class NeuralAnalyzer  implements NeuralNetListener{
 	Vector data=ds.loadCSVFile("/home/us/84690020040805.csv");
 	System.out.println("candles loaded from disc: "+data.size());
 	
-	double[][] dataset=new double[100][21];
+	double[][] dataset=new double[400][21];
+
+	int startpos=200;
+	int endpos=600;
+	
 //	for(int i=200;i<data.size()-100;i++){
-	for(int i=200;i<300;i++){
+	for(int i=startpos;i<endpos;i++){
 	    Vector v1=new Vector();
 	    for(int j=20;j>0;j--){
 		Candle c=(Candle)data.elementAt(i+j);
@@ -160,18 +174,18 @@ public class NeuralAnalyzer  implements NeuralNetListener{
 	    v1=normalizeVector(v1);
 	    for(int j=20;j>0;j--){
 //		Candle c=(Candle)v1.elementAt(j-1);
-    		dataset[i-200][j-1]=Double.parseDouble((String)v1.elementAt(j-1));
+    		dataset[i-startpos][j-1]=Double.parseDouble((String)v1.elementAt(j-1));
 	    }
 	    
 //	    System.out.println("Dataitems in input: "+inputData.size());
 	    Candle c0=(Candle)data.elementAt(i);
 	    Candle c1=(Candle)data.elementAt(i-1);
 	    Candle c2=(Candle)data.elementAt(i-2);
-	    if(c1.close>c0.close && c2.close>c0.close && c2.close>c1.close){
-		dataset[i-200][20]=1.0;
+	    if(c1.close>c0.close &&  c2.close>c1.close){
+		dataset[i-startpos][20]=1.0;
 	    }
 	    else{
-		dataset[i-200][20]=0.0;
+		dataset[i-startpos][20]=0.0;
 	    }
 	    
 	    
@@ -206,8 +220,8 @@ public class NeuralAnalyzer  implements NeuralNetListener{
 	input.start();
 	hidden.start();
 	output.start();
-	monitor.setTrainingPatterns(99); // # of rows (patterns) contained in the input file
-	monitor.setTotCicles(2000);            // How many times the net must be trained on the input patterns
+	monitor.setTrainingPatterns(399); // # of rows (patterns) contained in the input file
+	monitor.setTotCicles(8000);            // How many times the net must be trained on the input patterns
 	monitor.setLearning(true);              // The net must be trained
 	monitor.Go();                                   // The net starts the training job
 																									       
@@ -257,10 +271,14 @@ public class NeuralAnalyzer  implements NeuralNetListener{
 	DataSource ds=new DataSource();
 	Vector data=ds.loadCSVFile("/home/us/84690020040805.csv");
 	System.out.println("candles loaded from disc: "+data.size());
+
+	int startpos=50;
+	int endpos=150;
+
 	
 	double[][] dataset=new double[100][20];
 //	for(int i=200;i<data.size()-100;i++){
-	for(int i=300;i<400;i++){
+	for(int i=startpos;i<endpos;i++){
 	    db("\n");
 	    
 	    Vector v1=new Vector();
@@ -271,11 +289,12 @@ public class NeuralAnalyzer  implements NeuralNetListener{
 	    v1=normalizeVector(v1);
 	    for(int j=20;j>0;j--){
 //		Candle c=(Candle)v1.elementAt(j-1);
-    		dataset[i-300][j-1]=Double.parseDouble((String)v1.elementAt(j-1));
+    		dataset[i-startpos][j-1]=Double.parseDouble((String)v1.elementAt(j-1));
 	    }
 	    
 //	    System.out.println("Dataitems in input: "+inputData.size());
 	    Candle c0=(Candle)data.elementAt(i);
+	    db(c0.toString());
 	    Candle c1=(Candle)data.elementAt(i-1);
 	    Candle c2=(Candle)data.elementAt(i-2);
 	    if(c1.close>c0.close && c2.close>c0.close && c2.close>c1.close){
@@ -289,9 +308,9 @@ public class NeuralAnalyzer  implements NeuralNetListener{
 	    
 	    
 	 
-	 d(dataset[i-300]);
+	 d(dataset[i-startpos]);
 	 
-	  Pattern iPattern = new Pattern(dataset[i-300]);
+	  Pattern iPattern = new Pattern(dataset[i-startpos]);
 //          iPattern.setCount(i+1-300);
 //	iPattern.setCount(1);
 
@@ -299,15 +318,17 @@ public class NeuralAnalyzer  implements NeuralNetListener{
           memInp.fwdPut(iPattern);
 //    	d(memInp.getInputVector());					
 	  		                          // Read the output pattern and print out it
-								                      //double[] pattern = memOut.getNextPattern();
-	
-	db("Put, waiting for get.");
-          Pattern pattern = memOut.fwdGet();
-          System.out.println("Output Pattern #"+(i+1-300)+" = "+pattern.getArray()[0]);
+		if(i!=(endpos-1)){							                      //double[] pattern = memOut.getNextPattern();
+		
+			db("Put, waiting for get.");
+	        	  Pattern pattern = memOut.fwdGet();
+	        	  System.out.println("Output Pattern #"+(i+1-startpos)+" = "+pattern.getArray()[0]);
 
-	}
+		}
 																		      						     	
+	}
 
+	//draw that stuff.
     
     }
     void d(double[] in){
@@ -329,7 +350,7 @@ public class NeuralAnalyzer  implements NeuralNetListener{
 	//construct the network.
 	
 	
-	createNetwork(20,30,1);
+	createNetwork(20,42,1);
 	
 	train();
 	

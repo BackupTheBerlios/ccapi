@@ -41,7 +41,7 @@ public class Candle implements Serializable {
             return date.toGMTString() + "/" + open + "/" + hi + "/" + low +
             "/" + close + "/" + volume;
         } else {
-            return fullname + "/" + isin + "/" + datestring + "/" + open + "/" +
+            return datestring+"/"+fullname + "/" + isin + "/" + datestring + "/" + open + "/" +
             hi + "/" + low + "/" + close + "/" + volume;
         }
     }

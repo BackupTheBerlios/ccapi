@@ -24,7 +24,7 @@ CAUTION! Ignore warnings.
 	<javac 
 	     srcdir="src"
 	     destdir="bin"
-		 classpath="/opt/j2sdk1.4.1_02/jre/lib/jsse.jar:libs/OpenAI.jar:libs/log4j.jar:libs/joone-engine.jar"
+		 classpath="/opt/j2sdk1.4.1_02/jre/lib/jsse.jar:libs/OpenAI.jar:libs/log4j.jar:libs/joone-engine.jar:libs/jfree.jar"
 		 nowarn="on"	
 	/>	
 
