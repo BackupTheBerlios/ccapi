@@ -6,7 +6,6 @@ package CCAPI;
  * @author us
  *
  */
-
 public class Option implements Sortable {
     public String basevalue = "";
     public String wkn = "";
@@ -15,14 +14,12 @@ public class Option implements Sortable {
     public String validity = "";
     public String bv = "";
     public String type = "";
-	
+
     public void dump() {
-        System.out.println(
-                wkn + "/" + type + "/" + basevalue + "/" + baseprice + "/"
-                + validity + "/" + bv + "/" + emittent);
-		
+        System.out.println(wkn + "/" + type + "/" + basevalue + "/" +
+            baseprice + "/" + validity + "/" + bv + "/" + emittent);
     }
-	
+
     public int compare(Object b) {
         double v1 = Double.parseDouble(baseprice);
         double v2 = Double.parseDouble(((Option) b).baseprice);
@@ -30,7 +27,7 @@ public class Option implements Sortable {
         if (v2 > v1) {
             return 1;
         }
+
         return -1;
     }
-	
 }

@@ -3,12 +3,11 @@ package CCAPI;
 
 /**
  *
- * a helper object - contains a quote. 
+ * a helper object - contains a quote.
  *  @author us
  *
  */
 public class Quote {
-
     /**
      * the security id, is the ISIN or WKN.
      */
@@ -53,11 +52,11 @@ public class Quote {
      * contains the current quotation, the '*kurs*'
      */
     public double quotation;
-		
+
     /**
      * just a very flat constructor.
      *
      */
-    Quote() {}
-		
+    Quote() {
+    }
 }

@@ -1,13 +1,11 @@
 package CCAPI;
 
-
 import java.util.Vector;
 
 
 /**
- *	QuickSort implementation to sort a sortable object
+ *        QuickSort implementation to sort a sortable object
  */
-
 public class QuickSort {
     // Sorts entire array
     public static void sort(Vector array) {
@@ -30,7 +28,8 @@ public class QuickSort {
     }
 
     protected static int partition(Vector array, int start, int end) {
-        int left, right;
+        int left;
+        int right;
         Sortable partitionElement;
 
         // Arbitrary partition start...there are better ways...
@@ -38,24 +37,27 @@ public class QuickSort {
 
         left = start - 1;
         right = end;
+
         for (;;) {
-            while (compare(partitionElement, (Sortable) array.elementAt(++left))
-                    == 1) {
+            while (compare(partitionElement, (Sortable) array.elementAt(++left)) == 1) {
                 if (left == end) {
                     break;
                 }
             }
-            while (compare(partitionElement, (Sortable) array.elementAt(--right))
-                    == -1) {
+
+            while (compare(partitionElement, (Sortable) array.elementAt(--right)) == -1) {
                 if (right == start) {
                     break;
                 }
             }
+
             if (left >= right) {
                 break;
             }
+
             swap(array, left, right);
         }
+
         swap(array, left, end);
 
         return left;
@@ -69,4 +71,3 @@ public class QuickSort {
         array.setElementAt(temp, j);
     }
 }
- 

@@ -1,6 +1,9 @@
 <!-- CCAPI build file. author: us@activestocks.de -->
 <!-- protected by GPL -->
 <project default="deploy">
+
+
+
 <target name="deploy">
 
 	<!-- The caution message -->
@@ -14,6 +17,7 @@ CAUTION! Ignore warnings.
 	
 (c) ulrich staudinger, 2002 - 2004, Giveaway under the hood of GPL.
 	</echo>
+
 
 
 	<!-- compile to local bin folder -->
