@@ -1,3 +1,5 @@
+package CCAPI;
+
 /*--- formatted by Jindent 2.1, (www.c-lab.de/~jindent) ---*/
 
 import java.util.*;
@@ -24,6 +26,11 @@ import org.apache.log4j.*;
  */
 public class NeuralAnalyzer implements TerminatedEventListener {
 
+	
+
+	public NeuralAnalyzer(){
+		
+	}
     // our handle to the network
     public Network network = null;
 
@@ -100,10 +107,10 @@ public class NeuralAnalyzer implements TerminatedEventListener {
 	network.setErrorType(new MeanSquareErrorType());
 
 	// set the learning flag
-	network.setLearning(true);
+	//network.setLearning(true);
 
 	// set the training data
-	network.loadTrainingData("./trainingdata/xor.in", "./trainingdata/xor.out");
+	//network.loadTrainingData("./trainingdata/xor.in", "./trainingdata/xor.out");
 
 	// connect the network
 	try {
@@ -146,6 +153,123 @@ public class NeuralAnalyzer implements TerminatedEventListener {
 			       + terminateEvent.getErrorReached());
 	}
     }
+    
+    
+   
+
+    void train(){
+	//build the training set
+	DataSet traindata=new DataSet();
+	//populate the data set
+	DataSource ds=new DataSource();
+	Vector data=ds.loadCSVFile("/home/us/84690020040805.csv");
+	System.out.println("candles loaded from disc: "+data.size());
+	
+
+	for(int i=200;i<data.size()-100;i++){
+	    DataElement de=new DataElement();
+	    Vector inputData=new Vector();
+	    for(int j=20;j>0;j--){
+		Candle c=(Candle)data.elementAt(i+j);
+		inputData.addElement(""+c.close);
+	    }
+	    de.setInput(inputData);
+	    
+	    Candle c0=(Candle)data.elementAt(i);
+	    Candle c1=(Candle)data.elementAt(i-1);
+	    Candle c2=(Candle)data.elementAt(i-2);
+	    Vector desiredData=new Vector();
+	    if(c1.close>c0.close && c2.close>c0.close && c2.close>c1.close){
+		desiredData.addElement(""+1.0);
+	    }
+	    else{
+		desiredData.addElement(""+0.0);
+	    }
+	    de.setDesired(desiredData);
+	    //de.setOutput(desiredData);
+	    
+	    traindata.addElement(de);
+	    System.out.println("At loaded position: "+i);
+	}
+		    
+	
+
+	//set the dataset
+	network.setDataSet(traindata);
+	
+	//train the network.
+	network.setLearning(true);
+	train(0.9);
+	network.setLearning(false);
+	
+    }
+
+
+    public void test(){
+    	network.setLearning(false);
+
+//populate the data set
+	DataSource ds=new DataSource();
+	Vector data=ds.loadCSVFile("/home/us/84690020040805.csv");
+	System.out.println("candles loaded from disc: "+data.size());
+	
+	
+
+	for(int i=10;i<200;i++){
+	    DataSet dataset=new DataSet();
+	    DataElement de=new DataElement();
+	    Vector inputData=new Vector();
+	    for(int j=20;j>0;j--){
+		Candle c=(Candle)data.elementAt(i+j);
+		inputData.addElement(""+c.close);
+	    }
+	    
+	    de.setInput(inputData);
+	    
+	    Candle c0=(Candle)data.elementAt(i);
+	    Candle c1=(Candle)data.elementAt(i-1);
+	    Candle c2=(Candle)data.elementAt(i-2);
+	    
+	    de.setDesired(new Vector());
+	    dataset.addElement(de);
+	    network.setDataSet(dataset);
+	    
+	    try{
+        	network.iterateNetwork();
+		
+	    }	
+	    catch(Exception e){
+		e.printStackTrace();
+	    }
+	    Layer out=network.getOutputLayer();
+	    System.out.println("-----");
+	    System.out.println(c0.toString());
+	    System.out.println(c1.toString());
+	    System.out.println(c2.toString());
+	    System.out.println("out:"+out.toString());
+	    
+	}
+	
+
+    
+    }
+
+
+    public NeuralAnalyzer(String symbol){
+	//construct the network.
+	
+	
+	createNetwork(20,30,1);
+	
+	//set network algorithms.
+	setNetworkAlgorithms();
+	train();
+	
+	test();	
+    }
+
+
+
 
 
     /**
@@ -161,13 +285,13 @@ public class NeuralAnalyzer implements TerminatedEventListener {
 	BasicConfigurator.configure();
 
 
-	int i=2;
+	int i=20;
 	int h=3;
 	int o=1;
 	
 
-	NeuralAnalyzer analyzer = new NeuralAnalyzer();
-
+	NeuralAnalyzer analyzer = new NeuralAnalyzer("abcd");
+/*
 	analyzer.createNetwork(i,h,o);
 	analyzer.setNetworkAlgorithms();
 
@@ -207,7 +331,7 @@ public class NeuralAnalyzer implements TerminatedEventListener {
 	Layer out=analyzer.network.getOutputLayer();
 
 	System.out.println("out:"+out.toString());
-
+*/
     } 
 
 
