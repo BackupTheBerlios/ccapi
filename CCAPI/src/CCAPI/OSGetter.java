@@ -155,11 +155,8 @@ public class OSGetter {
                     StringTokenizer str = new StringTokenizer(l, ";");
 
                     str.nextToken();
-
                     Option o = new Option();
-
                     String wkn = str.nextToken();
-
                     wkn = extractWKN(wkn);
 
                     if (debug) {
@@ -167,9 +164,7 @@ public class OSGetter {
                     }
 
                     o.wkn = wkn;
-
                     String art = str.nextToken();
-
                     art = extractArt(art);
 
                     if (debug) {
@@ -177,9 +172,7 @@ public class OSGetter {
                     }
 
                     o.type = art;
-
                     String bwert = str.nextToken();
-
                     bwert = extractBWert(bwert);
 
                     if (debug) {
@@ -187,9 +180,7 @@ public class OSGetter {
                     }
 
                     o.basevalue = bwert;
-
                     String basispreis = str.nextToken();
-
                     basispreis = extractBasispreis(basispreis);
 
                     if (debug) {
@@ -197,9 +188,7 @@ public class OSGetter {
                     }
 
                     o.baseprice = basispreis;
-
                     String faelligkeit = str.nextToken();
-
                     faelligkeit = extractFaelligkeit(faelligkeit);
 
                     if (debug) {
@@ -207,19 +196,14 @@ public class OSGetter {
                     }
 
                     o.validity = faelligkeit;
-
                     String bv = str.nextToken();
-
                     bv = extractBV(bv);
 
                     if (debug) {
                         System.out.println("BV:" + bv);
                     }
-
                     o.bv = bv;
-
                     String emittent = str.nextToken();
-
                     emittent = extractEmi(emittent);
 
                     if (debug) {

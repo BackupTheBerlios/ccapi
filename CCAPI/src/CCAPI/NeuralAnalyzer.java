@@ -27,9 +27,6 @@ import org.joone.io.*;
  *
  *
  *
- *
- *
- *
  * */
 
 
@@ -153,7 +150,7 @@ public class NeuralAnalyzer  implements NeuralNetListener{
 	System.out.println("**********   B u i l d i n g   t r a i n i n g   s e t  ************");
 	
 	//populate the data set
-	DataSource ds=new DataSource();
+	FileDataSourceCSV ds=new FileDataSourceCSV();
 	Vector data=ds.loadCSVFile("/home/us/84690020040805.csv");
 	System.out.println("candles loaded from disc: "+data.size());
 	
@@ -266,7 +263,7 @@ public class NeuralAnalyzer  implements NeuralNetListener{
 	 monitor.Go();
 
 		 
-	DataSource ds=new DataSource();
+	FileDataSourceCSV ds=new FileDataSourceCSV();
 	Vector data=ds.loadCSVFile("/home/us/84690020040805.csv");
 	System.out.println("candles loaded from disc: "+data.size());
 

@@ -3,6 +3,26 @@
 
  A Java financial library.
 
+--------------------------------------
+
+*) Official homepage
+By the time of this writing the official homepage url is: http://www.activestocks.de 
+The repository is hosted on http://developer.berlios.de/projects/ccapi
+
+*) Obtaining and downloading
+Check the official homepage (see above) for informations about the library. 
+I do highly recommend you use CVS to actually obtain the data from our server. 
+Check the cvs instructions on http://developer.berlios.de/projects/ccapi . 
+
+*) Examples
+
+In ./src/Examples are example source files
+For an example of the neural analyzer see src/CCAPI/NeuralAnalyzer.java
+
+*) License
+This API is distributed under the GPL license. 
+Special licenses are available on request. 
+
 
 --------------------------------------
 (c) 2002-2004 Ulrich Staudinger

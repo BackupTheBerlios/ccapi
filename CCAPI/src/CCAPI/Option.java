@@ -9,6 +9,7 @@ import CCAPI.helpers.Sortable;
  *
  */
 public class Option implements Sortable {
+	
     public String basevalue = "";
     public String wkn = "";
     public String baseprice = "";
@@ -17,11 +18,20 @@ public class Option implements Sortable {
     public String bv = "";
     public String type = "";
 
-    public void dump() {
-        System.out.println(wkn + "/" + type + "/" + basevalue + "/" +
+    /**
+     * dumps out the option into the system.out.println and returns it as a string
+     *
+     */
+    public String dump() {
+        String ret = (wkn + "/" + type + "/" + basevalue + "/" +
             baseprice + "/" + validity + "/" + bv + "/" + emittent);
+        System.out.println(ret);
+        return ret; 
     }
 
+    /**
+     * can't remember what i needed this for ... 
+     */
     public int compare(Object b) {
         double v1 = Double.parseDouble(baseprice);
         double v2 = Double.parseDouble(((Option) b).baseprice);

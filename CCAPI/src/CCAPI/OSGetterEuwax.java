@@ -13,6 +13,13 @@ import org.htmlparser.tags.*;
 
 public class OSGetterEuwax{
 
+	/**
+	 * retreives a BNP dax
+	 * @param type
+	 * @param from
+	 * @param to
+	 * @return
+	 */
 	public String getKODax(String type, double from, double to){
 		
 		try{
@@ -42,7 +49,10 @@ public class OSGetterEuwax{
 		return "";
 	}
 	
-
+	/**
+	 * example main - will retreive a dax ko with ko value between 4000 and 4000
+	 * @param args
+	 */
 	public static void main(String[] args){
 		OSGetterEuwax o=new OSGetterEuwax();
 		o.getKODax("call", 4000.0,4000.0);

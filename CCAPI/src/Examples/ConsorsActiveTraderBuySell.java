@@ -10,6 +10,7 @@
 
 package Examples;
 import CCAPI.*;
+import CCAPI.BrokerInterface.ActiveTraderConnection;
 
 public class ConsorsActiveTraderBuySell {
 
@@ -30,4 +31,5 @@ public class ConsorsActiveTraderBuySell {
 	public static void main(String[] args) {
 		ConsorsActiveTraderBuySell r = new ConsorsActiveTraderBuySell();
 	}
+	
 }

@@ -37,7 +37,6 @@ public class ChartWindowExample {
 		
 		cw.draw(w);
 		
-		
 		// but you need to add a window listener
 		cw.addWindowListener(new WindowAdapter(){public void WindowClosed(WindowEvent e){
 			System.exit(0);

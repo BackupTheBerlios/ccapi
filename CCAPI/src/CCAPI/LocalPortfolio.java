@@ -4,10 +4,12 @@
  * GPL protected.
  * Author: Ulrich Staudinger
  * 
- * contains classes to manage a portfolio on disc. 
+ * contains classes to manage a portfolio on disc.
+ * a portfolio on hard drive  
  * 
  * 
  */
+
 package CCAPI;
 import java.util.*;
 
@@ -16,9 +18,13 @@ import javax.xml.transform.dom.*;
 import javax.xml.parsers.*;
 
 import org.apache.crimson.tree.DOMImplementationImpl;
+import org.apache.log4j.Logger;
 import org.w3c.dom.*;
 
+import java.io.*;
+
 public class LocalPortfolio {
+	static Logger _logger = Logger.getLogger(LocalPortfolio.class);
 	
 	/** 
 	 * holds the local positions 
@@ -28,7 +34,18 @@ public class LocalPortfolio {
 	 * represents the complete portfolio in xml 
 	 */
 	Document doc;
+	/**
+	 * the root
+	 */
 	Element root;
+	/**
+	 * contains the document parser
+	 */
+	DocumentBuilder db;
+	/**
+	 * holds the portfolio name 
+	 */
+	String portfolioname;
 	/**
 	 * opens the default portfolio 
 	 *
@@ -37,6 +54,13 @@ public class LocalPortfolio {
 		this("default.portfolio");
 		
 		doc = DOMImplementationImpl.getDOMImplementation().createDocument("A", "B", null);
+		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		try{
+			db = dbf.newDocumentBuilder();
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
 		
 		root = doc.createElement("portfolio");
 		//root.appendChild(doc.createElement("abcd"));
@@ -52,6 +76,7 @@ public class LocalPortfolio {
 	 * @param portfolioname
 	 */
 	public LocalPortfolio(String portfolioname){
+		this.portfolioname = portfolioname; 
 		open();
 	}
 	
@@ -71,7 +96,35 @@ public class LocalPortfolio {
 	 */
 	public void open(){
 		// open the portfolio
-		
+		try{
+			_logger.debug("Opening "+portfolioname);
+			System.out.println(portfolioname);
+			File f = new File(portfolioname);
+			
+			//need to parse the data 
+			Document doc = db.parse(f);
+			Element root = doc.getDocumentElement();
+			// check if we actually have a portfolio name 
+			if(root.getNodeName().equals("portfolio")){
+				// ok, portfolio found.  
+				NodeList nl = root.getChildNodes();
+				for(int i=0;i<nl.getLength();i++){
+					Node n = nl.item(i);
+					if(n.getNodeName().equals("transaction")){
+						Transaction t = new Transaction();
+						t.deserialize(n);
+						transactions.add(t);
+					}
+				}
+				
+			}
+			System.out.println(root.getNodeName());
+			
+		}
+		catch(Exception e){
+			e.printStackTrace();
+			_logger.fatal(e);
+		}
 	}
 	
 	/**
@@ -113,6 +166,17 @@ public class LocalPortfolio {
 		
 		System.out.println(dump(root));
 		
+		File f = new File(portfolioname);
+		try{
+			DataOutputStream dout = new DataOutputStream(new FileOutputStream(f));
+			dout.write(dump(root).getBytes());
+			dout.flush();
+			dout.close();
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+		
 	}
 	
 	/**
@@ -132,11 +196,8 @@ public class LocalPortfolio {
 				NodeList nl = node.getChildNodes();
 				for (int i=0;i<nl.getLength();i++){
 					ret += dump(nl.item(i));
-				}
-				
-				
+				}	
 			}
-			
 			ret+= "</"+node.getNodeName()+">";
 		}
 		else if(node.getNodeType() == 3){
@@ -147,11 +208,22 @@ public class LocalPortfolio {
 		return ret; 
 	}
 	
+	/**
+	 * actually clears the portfolio
+	 *
+	 */
+	public void clear(){
+		transactions = new Vector();
+		save();
+	}
+	
 	public static void main(String[] args){
 		LocalPortfolio lp = new LocalPortfolio();
 		Transaction t = new Transaction();
 		t.isin = "abcd";
 		lp.addTransaction(t);
 		lp.save();
+		System.out.println("loading now.... \n\n");
+		lp.open();
 	}
 }

@@ -11,6 +11,7 @@ package Examples;
 
 import java.util.*;
 import CCAPI.*;
+import CCAPI.DataRetrieval.ConsorsQuoteRetriever;
 
 public class RSISystem {
 	
@@ -18,7 +19,6 @@ public class RSISystem {
 		// doing a plain rsi system 
 		ConsorsQuoteRetriever cqr = new ConsorsQuoteRetriever();
 		Vector data = cqr.getHistory(cqr.search("846900"));
-		
 		
 		FinancialLibrary fl = new FinancialLibrary();
 		double rsi0, rsi1;
@@ -32,10 +32,7 @@ public class RSISystem {
 
 		if( rsi1 > 70  && rsi0 < 70 ){
 			System.out.println("SELL.");
-		}
-		
-
-		
+		}		
 	}
 	
 	public static void main(String[] args) {

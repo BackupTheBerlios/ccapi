@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry exported="true" kind="lib" path="libs/bsh.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/checkstyle-all-3.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/commons-logging.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/fit.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/htmllexer.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/htmlparser.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/jfree.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/joone-engine.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/junit.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/log4j.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/OpenAI.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/sax2.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/thumbelina.jar"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

@@ -11,6 +11,7 @@ package Examples;
 
 import java.util.Vector;
 import CCAPI.*;
+import CCAPI.DataRetrieval.ConsorsQuoteRetriever;
 
 public class DataRetrievalExample {
 
