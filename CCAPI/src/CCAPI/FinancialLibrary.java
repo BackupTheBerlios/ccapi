@@ -1351,6 +1351,8 @@ public class FinancialLibrary {
 
     /**
      * returns the starc bands in a double array, val[0] lower starc band, val[3] upper starc band
+     * use val[1] + val[2] for the factor1 starc bands.
+     * good parameter settings are: v/20/14/2/3.
      * @param v
      * @param closeAverage
      * @param truerangeAverage
