@@ -2,9 +2,13 @@
  *        GPL
  *        @author         ulrich staudinger, 2004
  *        @version        1.0
+ * 
+ * 	ActiveTraderConnection communicates with the Cortal Consors ActiveTrader 
+ *  through it's external interface
+ * 
  */
-package CCAPI;
 
+package CCAPI;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 

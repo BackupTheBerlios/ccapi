@@ -6,6 +6,8 @@ import java.net.*;
 
 import java.util.*;
 
+import CCAPI.helpers.QuickSort;
+
 
 /**
  *        OSGetter gets a list of Optionsscheine from the stuttgarter euwax servers.  check the source to see which wkns are supported. Add your own wkn<->euwax mappings and mail them to me. Can be used as standalone application.

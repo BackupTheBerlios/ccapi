@@ -1,200 +1,210 @@
 package CCAPI;
 
 import java.io.*;
-
 import java.net.*;
-
 import java.util.*;
 
 
 /**
- *        class to retrieve historical informations from the cortal consors servers. works very well.
- *
+ * class to retrieve historical informations from the cortal consors servers.
+ * works very well.
+ *  
  */
 public class ConsorsQuoteRetriever {
-    /**
-     *   plain constructor
-     */
-    public ConsorsQuoteRetriever() {
-    }
+	boolean debug = false;
 
-    /**
-     *        retrieves the history
-     */
-    static public Vector getHistory(String isin) {
-        Vector ret = new Vector();
+	/**
+	 * plain constructor
+	 */
+	public ConsorsQuoteRetriever() {
+	}
 
-        try {
-            URL url = new URL(
-                    "http://chartdata.consors.onvista.de/data/quotes.html");
-            HttpURLConnection hpcon = (HttpURLConnection) url.openConnection();
+	// overloaded constructor that does generate debug messages
+	public ConsorsQuoteRetriever(boolean debug) {
+		this.debug = debug;
+	}
 
-            hpcon.setRequestProperty("POST", "/data/quotes.html HTTP/1.1");
+	/**
+	 * retrieves the history
+	 */
+	public Vector getHistory(String isin) {
+		Vector ret = new Vector();
 
-            hpcon.setRequestProperty("Content-Type",
-                "application/x-www-form-urlencoded");
+		try {
+			URL url = new URL(
+					"http://chartdata.consors.onvista.de/data/quotes.html");
+			HttpURLConnection hpcon = (HttpURLConnection) url.openConnection();
 
-            hpcon.setRequestProperty("User-Agent", "GeVaSyS NetClient");
-            hpcon.setRequestProperty("cookie", "");
-            hpcon.setRequestProperty("Pragma", "no-cache");
+			hpcon.setRequestProperty("POST", "/data/quotes.html HTTP/1.1");
 
-            hpcon.setRequestProperty("Host", "chartdata.consors.onvista.de");
+			hpcon.setRequestProperty("Content-Type",
+					"application/x-www-form-urlencoded");
 
-            String request =
-                "message=%23+DATAOBJECT%0AQUERY%0A%23+Function%0AgetLongtermHistory%0A%23+UserId%0Auser%0A%23+ISIN%0A" +
-                isin +
-                "%0A%23+Exchange%0AGER%0A%23+BeginDate%0A%0A%23+EndDate%0A%0A%23%0A";
+			hpcon.setRequestProperty("User-Agent", "GeVaSyS NetClient");
+			hpcon.setRequestProperty("cookie", "");
+			hpcon.setRequestProperty("Pragma", "no-cache");
 
-            hpcon.setRequestProperty("Content-Length", "" + request.length());
+			hpcon.setRequestProperty("Host", "chartdata.consors.onvista.de");
 
-            hpcon.setDoOutput(true);
+			String request = "message=%23+DATAOBJECT%0AQUERY%0A%23+Function%0AgetLongtermHistory%0A%23+UserId%0Auser%0A%23+ISIN%0A"
+					+ isin
+					+ "%0A%23+Exchange%0AGER%0A%23+BeginDate%0A%0A%23+EndDate%0A%0A%23%0A";
 
-            OutputStream os = hpcon.getOutputStream();
+			hpcon.setRequestProperty("Content-Length", "" + request.length());
 
-            os.write(request.getBytes());
-            os.close();
+			hpcon.setDoOutput(true);
 
-            // InputStream is=url.openStream();
-            DataInputStream din = new DataInputStream(new BufferedInputStream(
-                        hpcon.getInputStream()));
+			OutputStream os = hpcon.getOutputStream();
 
-            String name = "";
-            String isin2 = "";
+			os.write(request.getBytes());
+			os.close();
 
-            // read all line wise and append to ret.
-            String l = din.readLine();
-            boolean quotes = false;
+			// InputStream is=url.openStream();
+			DataInputStream din = new DataInputStream(new BufferedInputStream(
+					hpcon.getInputStream()));
 
-            while (l != null) {
-                System.out.println("ConsorsQuoteRetriever READ: " + l);
+			String name = "";
+			String isin2 = "";
 
-                if (quotes) {
-                    if (l.equals("#")) {
-                        break;
-                    }
+			// read all line wise and append to ret.
+			String l = din.readLine();
+			boolean quotes = false;
 
-                    StringTokenizer str = new StringTokenizer(l, ";");
-                    Candle c = new Candle();
+			while (l != null) {
+				if (debug)
+					System.out.println("ConsorsQuoteRetriever READ: " + l);
 
-                    c.datestring = str.nextToken();
-                    c.open = Double.parseDouble(str.nextToken());
-                    c.hi = Double.parseDouble(str.nextToken());
-                    c.low = Double.parseDouble(str.nextToken());
-                    c.close = Double.parseDouble(str.nextToken());
-                    c.volume = Integer.parseInt(str.nextToken());
+				if (quotes) {
+					if (l.equals("#")) {
+						break;
+					}
 
-                    //
-                    c.fullname = name;
-                    c.isin = isin2;
+					StringTokenizer str = new StringTokenizer(l, ";");
+					Candle c = new Candle();
 
-                    ret.addElement(c);
-                }
+					c.datestring = str.nextToken();
+					c.open = Double.parseDouble(str.nextToken());
+					c.hi = Double.parseDouble(str.nextToken());
+					c.low = Double.parseDouble(str.nextToken());
+					c.close = Double.parseDouble(str.nextToken());
+					c.volume = Integer.parseInt(str.nextToken());
 
-                if (l.startsWith("#Datetime;Open;High;Low;Close")) {
-                    quotes = true;
-                }
+					//
+					c.fullname = name;
+					c.isin = isin2;
 
-                if (l.startsWith("# Name")) {
-                    name = din.readLine();
-                }
+					ret.addElement(c);
+				}
 
-                if (l.startsWith("# ISIN")) {
-                    isin2 = din.readLine();
-                }
+				if (l.startsWith("#Datetime;Open;High;Low;Close")) {
+					quotes = true;
+				}
 
-                // l+= new String(l.getBytes("UTF-8"));
-                l = din.readLine();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+				if (l.startsWith("# Name")) {
+					name = din.readLine();
+				}
 
-        System.out.println("ConsorsQuoteRetriever Read " + ret.size() +
-            " candles");
+				if (l.startsWith("# ISIN")) {
+					isin2 = din.readLine();
+				}
 
-        Vector r1 = new Vector();
+				// l+= new String(l.getBytes("UTF-8"));
+				l = din.readLine();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
-        for (int i = 0; i < ret.size(); i++) {
-            r1.addElement((Candle) ret.elementAt(ret.size() - 1 - i));
-        }
+		if (debug)
+			System.out.println("ConsorsQuoteRetriever Read " + ret.size()
+					+ " candles");
 
-        return r1;
-    }
+		Vector r1 = new Vector();
 
-    static public String search(String q) {
-        try {
-            URL url = new URL(
-                    "http://chartdata.consors.onvista.de/data/search.html");
-            HttpURLConnection hpcon = (HttpURLConnection) url.openConnection();
+		for (int i = 0; i < ret.size(); i++) {
+			r1.addElement((Candle) ret.elementAt(ret.size() - 1 - i));
+		}
 
-            hpcon.setRequestProperty("POST", "/data/search.html HTTP/1.1");
+		return r1;
+	}
 
-            hpcon.setRequestProperty("Content-Type",
-                "application/x-www-form-urlencoded");
+	public String search(String q) {
+		try {
+			URL url = new URL(
+					"http://chartdata.consors.onvista.de/data/search.html");
+			HttpURLConnection hpcon = (HttpURLConnection) url.openConnection();
 
-            hpcon.setRequestProperty("User-Agent", "GeVaSyS NetClient");
-            hpcon.setRequestProperty("cookie", "");
-            hpcon.setRequestProperty("Pragma", "no-cache");
+			hpcon.setRequestProperty("POST", "/data/search.html HTTP/1.1");
 
-            hpcon.setRequestProperty("Host", "chartdata.consors.onvista.de");
+			hpcon.setRequestProperty("Content-Type",
+					"application/x-www-form-urlencoded");
 
-            // String request="message=%23+DATAOBJECT%0AQUERY%0A%23+Function%0AgetLongtermHistory%0A%23+UserId%0Auser%0A%23+ISIN%0A99456%0A%23+Exchange%0AGER%0A%23+BeginDate%0A%0A%23+EndDate%0A%0A%23%0A";
-            String request =
-                "message=%23+DATAOBJECT%0AQUERY%0A%23+Function%0Asearch%0A%23+UserId%0Auser%0A%23+Pattern%0A" +
-                q + "%0A%23%0A";
+			hpcon.setRequestProperty("User-Agent", "GeVaSyS NetClient");
+			hpcon.setRequestProperty("cookie", "");
+			hpcon.setRequestProperty("Pragma", "no-cache");
 
-            hpcon.setRequestProperty("Content-Length", "" + request.length());
+			hpcon.setRequestProperty("Host", "chartdata.consors.onvista.de");
 
-            hpcon.setDoOutput(true);
+			// String
+			// request="message=%23+DATAOBJECT%0AQUERY%0A%23+Function%0AgetLongtermHistory%0A%23+UserId%0Auser%0A%23+ISIN%0A99456%0A%23+Exchange%0AGER%0A%23+BeginDate%0A%0A%23+EndDate%0A%0A%23%0A";
+			String request = "message=%23+DATAOBJECT%0AQUERY%0A%23+Function%0Asearch%0A%23+UserId%0Auser%0A%23+Pattern%0A"
+					+ q + "%0A%23%0A";
 
-            OutputStream os = hpcon.getOutputStream();
+			hpcon.setRequestProperty("Content-Length", "" + request.length());
 
-            os.write(request.getBytes());
-            os.close();
+			hpcon.setDoOutput(true);
 
-            // InputStream is=url.openStream();
-            DataInputStream din = new DataInputStream(new BufferedInputStream(
-                        hpcon.getInputStream()));
+			OutputStream os = hpcon.getOutputStream();
 
-            // read all line wise and append to ret.
-            String l = din.readLine();
+			os.write(request.getBytes());
+			os.close();
 
-            if (l == null) {
-                System.out.println("LINE = NULL!!!!");
-            }
+			// InputStream is=url.openStream();
+			DataInputStream din = new DataInputStream(new BufferedInputStream(
+					hpcon.getInputStream()));
 
-            while (l != null) {
-                System.out.println(l);
+			// read all line wise and append to ret.
+			String l = din.readLine();
 
-                if (l.startsWith("# Name; ISIN; NSIN")) {
-                    l = din.readLine();
-                    System.out.println(l);
+			if (l == null) {
+				if (debug)
+					System.out.println("LINE = NULL!!!!");
+			}
 
-                    StringTokenizer str = new StringTokenizer(l, ";");
-                    String name = str.nextToken();
-                    String ret = str.nextToken();
+			while (l != null) {
+				if (debug)
+					System.out.println(l);
 
-                    ret = ret.trim();
+				if (l.startsWith("# Name; ISIN; NSIN")) {
+					l = din.readLine();
+					if(debug)System.out.println(l);
 
-                    return ret;
-                }
+					StringTokenizer str = new StringTokenizer(l, ";");
+					String name = str.nextToken();
+					String ret = str.nextToken();
 
-                // l+= new String(l.getBytes("UTF-8"));
-                l = din.readLine();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+					ret = ret.trim();
 
-        return "";
-    }
+					return ret;
+				}
 
-    public static void main(String[] args) {
-        Vector v = getHistory(search("846900"));
-        Candle c0 = (Candle) v.elementAt(0);
-        Candle cX = (Candle) v.elementAt(v.size() - 1);
+				// l+= new String(l.getBytes("UTF-8"));
+				l = din.readLine();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
-        System.out.println("Candle 0: " + c0.toString());
-        System.out.println("Candle X: " + cX.toString());
-    }
+		return "";
+	}
+
+	public static void main(String[] args) {
+		ConsorsQuoteRetriever cqr = new ConsorsQuoteRetriever();
+		Vector v = cqr.getHistory(cqr.search("846900"));
+		Candle c0 = (Candle) v.elementAt(0);
+		Candle cX = (Candle) v.elementAt(v.size() - 1);
+
+		System.out.println("Candle 0: " + c0.toString());
+		System.out.println("Candle X: " + cX.toString());
+	}
 }

@@ -19,6 +19,4 @@ public class Indicator {
 		this.indicator_name=indicator_name;
 	}
 	
-	
-	
 }

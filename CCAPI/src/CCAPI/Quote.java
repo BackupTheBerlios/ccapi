@@ -3,7 +3,7 @@ package CCAPI;
 
 /**
  *
- * a helper object - contains a quote.
+ * a quote object - contains a quote.
  *  @author us
  *
  */
@@ -57,6 +57,6 @@ public class Quote {
      * just a very flat constructor.
      *
      */
-    Quote() {
+    public Quote() {
     }
 }

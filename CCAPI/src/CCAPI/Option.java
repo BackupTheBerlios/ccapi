@@ -1,5 +1,7 @@
 package CCAPI;
 
+import CCAPI.helpers.Sortable;
+
 
 /**
  * This is an Optionsschein class, as to be found in a list obtained through OSGetter

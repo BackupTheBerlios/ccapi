@@ -5,6 +5,7 @@ import java.io.DataInputStream;
 import java.net.URL;
 
 
+
 /**
  *
  * retrieves a quote from comdirect

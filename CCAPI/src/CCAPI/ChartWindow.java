@@ -7,6 +7,7 @@
 
 package CCAPI;
 
+
 /**
  * this class is contains a chart window
  *
@@ -23,11 +24,16 @@ import javax.swing.event.*;
 import java.awt.event.*;
 
 import org.jfree.chart.*;
+
+
 import org.jfree.chart.axis.*;
 import org.jfree.chart.plot.*;
 import org.jfree.chart.renderer.*;
 import org.jfree.data.time.*;
 import org.jfree.data.*;
+
+
+
 
 
 public class ChartWindow extends JFrame {
@@ -76,12 +82,12 @@ public class ChartWindow extends JFrame {
 	 */
 
 	ChartWindow thisp;
-	public ChartWindow(String symbol){
+	public ChartWindow(String title){
 
-		this.symbol=symbol;
+		this.symbol=title;
 		thisp=this;
 		//initialize the main layout
-		setTitle(symbol);
+		setTitle(title);
 		mainpanel=new JPanel();
 		GridBagLayout gbl=new GridBagLayout();
 		GridBagConstraints gbc=new GridBagConstraints();
