@@ -18,6 +18,13 @@ import net.openai.ai.nn.persistence.*;
 import org.apache.log4j.*;
 
 
+import org.joone.engine.*;
+import org.joone.engine.learning.*;
+import org.joone.io.*;
+
+
+
+
 /**
  * This class is an example of how to create a neural net.  This is
  * an awkward way for the moment and will be quickly replaced by XML
@@ -36,7 +43,12 @@ public class NeuralAnalyzer implements TerminatedEventListener {
 
     // the collection of layers for the network
     Vector  layers = null;
-
+    FinancialLibrary fl=new FinancialLibrary();
+    
+    
+    
+    
+    
     /**
      * 
      * This method creates the analyzer network.  The input and output
@@ -48,6 +60,19 @@ public class NeuralAnalyzer implements TerminatedEventListener {
      * @param args The command line args passed into main.
      */
     public void createNetwork(int inputNeurons, int hiddenNeurons, int outputNeurons) {
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+	
+    
+    
 	network = new Network();
 
 	// by uncommenting this next line the net will converge much
@@ -56,7 +81,7 @@ public class NeuralAnalyzer implements TerminatedEventListener {
 	//network.setUseBias(true);
 
 
-	network.setSize(3);
+	network.setSize(2);
 
 	layers = network.getLayers();
 
@@ -84,10 +109,14 @@ public class NeuralAnalyzer implements TerminatedEventListener {
 		layer.setName("Hidden");
 		layer.setSize(hiddenNeurons);
 	    } 
+	    
 
 	    // for all layers set these default algorithms
 	    layer.setInputFunction(new DotProductInputFunction());
-	    layer.setLearningRule(new BackPropagationLearningRule());
+	    BackPropagationLearningRule rule=new BackPropagationLearningRule();
+	    rule.setAlpha(0.9);
+	    rule.setBeta(0.9);
+	    layer.setLearningRule(rule);
 	    layer.setTransferFunction(new SigmoidTransferFunction());
 	    //db(layers.toString());
 	} 
@@ -115,6 +144,7 @@ public class NeuralAnalyzer implements TerminatedEventListener {
 	// connect the network
 	try {
 	    network.connect();
+	    network.randomize();
 	} catch (Exception e) {
 	    db("Could not connect network.");
 	    e.printStackTrace();
@@ -131,6 +161,7 @@ public class NeuralAnalyzer implements TerminatedEventListener {
 	iterator.setIterationTerminator(new TerminateOnCriterion(criterion));
 	network.setNetworkIterator(iterator);
 	network.addTerminatedEventListener(this);
+	
 	try {
 	    network.iterateNetwork();
 	} catch (NetworkException e) {
@@ -145,6 +176,7 @@ public class NeuralAnalyzer implements TerminatedEventListener {
      * @param event The TerminatedEvent
      */
     public void handleTerminatedEvent(TerminatedEvent event) {
+	System.out.println("Event: "+event.toString());
 	if(event instanceof TerminateOnCriterionEvent) {
 	    TerminateOnCriterionEvent terminateEvent 
 		= (TerminateOnCriterionEvent) event;
@@ -158,22 +190,32 @@ public class NeuralAnalyzer implements TerminatedEventListener {
    
 
     void train(){
+	System.out.println("**********   B u i l d i n g   t r a i n i n g   s e t  ************");
 	//build the training set
 	DataSet traindata=new DataSet();
+	traindata.addOutputCategory("buy");
+	
+	for(int i=0;i<20;i++){
+	    traindata.addInputCategory("Input"+i);
+	}
+	
 	//populate the data set
 	DataSource ds=new DataSource();
 	Vector data=ds.loadCSVFile("/home/us/84690020040805.csv");
 	System.out.println("candles loaded from disc: "+data.size());
 	
 
-	for(int i=200;i<data.size()-100;i++){
+//	for(int i=200;i<data.size()-100;i++){
+	for(int i=200;i<300;i++){
 	    DataElement de=new DataElement();
 	    Vector inputData=new Vector();
+	    
 	    for(int j=20;j>0;j--){
 		Candle c=(Candle)data.elementAt(i+j);
-		inputData.addElement(""+c.close);
+		inputData.addElement(c);
 	    }
-	    de.setInput(inputData);
+//	    System.out.println("Dataitems in input: "+inputData.size());
+	    de.setInput(normalizeVector(inputData));
 	    
 	    Candle c0=(Candle)data.elementAt(i);
 	    Candle c1=(Candle)data.elementAt(i-1);
@@ -185,11 +227,18 @@ public class NeuralAnalyzer implements TerminatedEventListener {
 	    else{
 		desiredData.addElement(""+0.0);
 	    }
+	    
+	    //DataElement trainelement=new DataElement(inputData, desiredData);
+	    
 	    de.setDesired(desiredData);
+	    de.setOutput(desiredData);
+	    
 	    //de.setOutput(desiredData);
 	    
 	    traindata.addElement(de);
-	    System.out.println("At loaded position: "+i);
+	    
+	    System.out.println("******   building next dataset:  "+i);
+//	    System.out.println(" ******* Training done. ********");
 	}
 		    
 	
@@ -199,14 +248,31 @@ public class NeuralAnalyzer implements TerminatedEventListener {
 	
 	//train the network.
 	network.setLearning(true);
-	train(0.9);
+	train(5.0);
 	network.setLearning(false);
 	
     }
 
 
+    Vector normalizeVector(Vector input){
+	Vector ret=new Vector();
+	
+	double min=fl.min(input,0, input.size());
+	double max=fl.max(input,0,input.size());
+	
+	for(int i=0;i<input.size();i++){
+	    Candle c=(Candle)input.elementAt(i);	
+	    ret.addElement(""+((c.close-min)/(max-min)));
+	}
+	
+	return ret;
+	
+    }
+
     public void test(){
     	network.setLearning(false);
+
+	BatchNetworkIterator batch=new BatchNetworkIterator();
 
 //populate the data set
 	DataSource ds=new DataSource();
@@ -217,31 +283,60 @@ public class NeuralAnalyzer implements TerminatedEventListener {
 
 	for(int i=10;i<200;i++){
 	    DataSet dataset=new DataSet();
+	    dataset.addOutputCategory("buy");
+	
+	    for(int k=0;k<20;k++){
+		dataset.addInputCategory("Input"+i);
+	    }
+	
 	    DataElement de=new DataElement();
 	    Vector inputData=new Vector();
 	    for(int j=20;j>0;j--){
 		Candle c=(Candle)data.elementAt(i+j);
-		inputData.addElement(""+c.close);
+		inputData.addElement(c);
 	    }
 	    
-	    de.setInput(inputData);
+	    de.setInput(normalizeVector(inputData));
 	    
 	    Candle c0=(Candle)data.elementAt(i);
 	    Candle c1=(Candle)data.elementAt(i-1);
 	    Candle c2=(Candle)data.elementAt(i-2);
 	    
-	    de.setDesired(new Vector());
+	    
+	    //de.setDesired(new Vector());
+	    Vector o=new Vector();
+	    o.addElement(""+0);
+    	    de.setOutput(o);
+	    
 	    dataset.addElement(de);
+	    
 	    network.setDataSet(dataset);
+	    //network.setDataElement(de);
+
+	    
 	    
 	    try{
-        	network.iterateNetwork();
-		
+        	Layer in=network.getLayerAt(0);
+		Layer hid=network.getLayerAt(1);
+    		Layer out=network.getLayerAt(2);
+	    
+	
+		//in.calculate();
+		//hid.calculate();
+		//out.calculate();    
+	    
+		batch.iterate(network);
+	    
+		//network.iterateNetwork();
+		//network.iterateNetwork();	
 	    }	
 	    catch(Exception e){
 		e.printStackTrace();
 	    }
+	    
 	    Layer out=network.getOutputLayer();
+	    
+	    
 	    System.out.println("-----");
 	    System.out.println(c0.toString());
 	    System.out.println(c1.toString());
@@ -259,7 +354,7 @@ public class NeuralAnalyzer implements TerminatedEventListener {
 	//construct the network.
 	
 	
-	createNetwork(20,30,1);
+	createNetwork(20,2,1);
 	
 	//set network algorithms.
 	setNetworkAlgorithms();
