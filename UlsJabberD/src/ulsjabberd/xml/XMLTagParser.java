@@ -188,6 +188,8 @@ public class XMLTagParser {
 
     public void state8(String c) {
         if (c.equals("<")) {
+        	// checking if there is only whitespace in this ...  
+        	//cdata = this.cdata.trim();
             state = S9;
         }
         else {
@@ -275,5 +277,19 @@ public class XMLTagParser {
         taglisteners.removeElement(t);
     }
 
+    /**
+     * resets the node tree. 
+     *
+     */
+    public void reset(){
+    	child = null;
+    	element = new Element();
+        tagname = "";
+        attributes = new PHashtable();
+        attributename = "";
+        attributevalue = "";
+        cdata = "";
+        closetagname = "";
+    }
     public Vector taglisteners = new Vector();
 }

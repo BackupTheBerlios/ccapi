@@ -21,7 +21,12 @@ public class Accepter extends Thread{
 	Starter s;
 	Vector connections, pollers;
 	
-	Pinger pinger; 
+	// package local classes
+	Pinger pinger;
+	Vector workerThreads;
+	public UserManager um; 
+	
+	Vector tagHandlers;
 	
 	/**
 	 * plain constructor
@@ -40,8 +45,14 @@ public class Accepter extends Thread{
 		}
 		connections = new Vector();
 		pollers = new Vector();
+		tagHandlers = new Vector();
 		// construct the pinger
 		pinger = new Pinger(this);
+		// initializing the user manager
+		um = new UserManager();
+		// initialize the worker threads
+		initializeWorkerThreads();
+		
 		
 	}
 	
@@ -101,4 +112,57 @@ public class Accepter extends Thread{
 		_logger.info("Removing connection, #connections "+connections.size());
 	}	
 
+	public void initializeWorkerThreads(){
+		workerThreads = new Vector();
+		for(int i=0;i<5;i++){
+			TagHandlerWorkerThread thwt = new TagHandlerWorkerThread(this);
+			workerThreads.add(thwt);
+			thwt.start();
+		}
+	}
+	
+	/**
+	 * pushes a tag handler to our tagHandler vector 
+	 * @param t
+	 */
+	void pushTagHandler(TagHandler t){
+		tagHandlers.addElement(t);
+	}
+	
+	/**
+	 * popping
+	 * @return
+	 */
+	TagHandler popTagHandler(){
+		// need to lock this function
+		if(tagHandlers.size()>0){
+			TagHandler th = (TagHandler)tagHandlers.elementAt(0);
+			tagHandlers.remove(0);
+			return th;
+		}
+		return null;
+	}
+	
+	/**
+	 * actually returns the connection with either the highest priority for a given username
+	 * or a specific resource
+	 *  
+	 * @param username
+	 * @return
+	 */
+	public JabberConnection getConnection(String username, String resource){
+		int j = connections.size();
+		try{
+			for(int i=0;i<j;i++){
+				JabberConnection jc = (JabberConnection)connections.elementAt(i);
+				System.out.println(jc.username+ " - "+username);
+				if(jc.username.equals(username))return jc;
+			}
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
 }

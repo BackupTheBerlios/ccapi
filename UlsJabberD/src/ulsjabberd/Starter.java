@@ -11,6 +11,7 @@ import java.util.*;
 import java.io.*;
 import org.apache.log4j.*;
 import org.apache.log4j.xml.DOMConfigurator;
+import com.mysql.*;
 
 public class Starter {
 	
@@ -26,6 +27,7 @@ public class Starter {
 
 	private final Properties config;
 	private Accepter a;
+	DBGate dbgate;
 	
 	public Starter(){
 		
@@ -40,6 +42,9 @@ public class Starter {
 			// 
 			String servername = config.getProperty("servername", "localhost");
 			System.out.println(config.getProperty("port"));
+			
+			// initialize the database
+			dbgate = new DBGate();
 			
 			// ok,init done. open the Accepter
 			a=new Accepter(this);
