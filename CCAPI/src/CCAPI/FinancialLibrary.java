@@ -188,7 +188,7 @@ public class FinancialLibrary {
             uptrend = false;
         }
 
-        // find first extreme point. 
+        // find first extreme point.
         boolean extremefound = false;
 
         int index = 0;
@@ -957,6 +957,7 @@ public class FinancialLibrary {
         return t2;
     }
 
+
     /**
      * returns the true range of a day, defined by the skipdays
      *
@@ -1332,24 +1333,54 @@ public class FinancialLibrary {
         return ret;
     }
 
-	Vector normalizeVector(Vector input){
+	public Vector normalizeVector(Vector input){
 		Vector ret=new Vector();
-			                                                                                                         
+
 		double min=min(input,0, input.size());
 		double max=max(input,0,input.size());
-				                                                                                                         
+
 		for(int i=0;i<input.size();i++){
 			Candle c=(Candle)input.elementAt(i);
 			ret.addElement(""+((c.close-min)/(max-min)));
 		}
-						                                                                                                         
+
 		return ret;
-							                                                                                                         
+
 	}
-	
-
-    
 
 
-	    
+    /**
+     * returns the starc bands in a double array, val[0] lower starc band, val[3] upper starc band
+     * @param v
+     * @param closeAverage
+     * @param truerangeAverage
+     * @param factor1
+     * @param factor2
+     * @return
+     */
+    public double[] starc(Vector v, int closeAverage, int truerangeAverage, double factor1, double factor2, int skipdays){
+		double[] ret = new double[4];
+
+		double atr;
+		// calculate the average of the true range for a couple of days.
+		for(int i=0;i<truerangeAverage;i++){
+			//
+			atr+=tr(v, skipdays+i);
+		}
+		atr/=(double)truerangeAverage;
+
+
+		// calculate the moving average of the close price
+		double mav=SMA(closeAverage, v, skipdays);
+
+		ret[0]=mav - (factor2*atr);
+		ret[1]=mav - (factor1*atr);
+		ret[2]=mav + (factor1*atr);
+		ret[3]=mav + (factor1*atr);
+
+		return ret;
+	}
+
+
+
 }
