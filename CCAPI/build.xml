@@ -1,0 +1,62 @@
+<project default="deploy">
+<target name="deploy">
+
+	
+	<javac 
+	    srcdir="src"
+	    destdir="bin"
+	>	
+	</javac>
+
+
+	<javac srcdir="src" destdir="../../GlobalMarketScreener/bin"/>
+
+
+	<jar destfile="/opt/jboss-3.2.3/server/default/deploy/10_CCAPI.jar" compress="false">
+		<fileset dir="bin">
+			
+		</fileset>
+	
+	</jar>
+
+	
+
+
+	<!-- CVS
+	
+	<cvs cvsRoot=":ext:staudinger@cvs.sourceforge.net:/cvsroot/redhorn"
+		command="co -m \"commiting from ant\"" />
+	-->
+</target>
+
+<target name="local">
+
+	
+	<javac 
+	    srcdir="src"
+	    destdir="bin"
+	>
+		
+
+		
+	</javac>
+
+
+	<javac srcdir="src" destdir="../../GlobalMarketScreener/bin"/>
+
+	<jar destfile="/home/us/192.168.40.120/jboss-3.2.3/server/default/deploy/10_CCAPI.jar" compress="false">
+		<fileset dir="bin">
+			
+		</fileset>
+	
+	</jar>
+
+	
+
+</target>
+
+<target name="web">
+	<javac srcdir="src" destdir="bin"/>
+		
+</target>
+</project>
