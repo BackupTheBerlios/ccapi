@@ -15,5 +15,11 @@
 	<classpathentry exported="true" kind="lib" path="libs/sax2.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/thumbelina.jar"/>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="libs"/>
+	<classpathentry kind="lib" path="C:/Jts/jcommon-0.9.0.jar"/>
+	<classpathentry kind="lib" path="C:/Jts/jfreechart-0.9.15.jar"/>
+	<classpathentry kind="lib" path="C:/Jts/jts.jar"/>
+	<classpathentry kind="lib" path="C:/Jts/Java/classes.jar"/>
+	<classpathentry kind="lib" path="C:/MATLAB6p5/java/jar/jmi.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

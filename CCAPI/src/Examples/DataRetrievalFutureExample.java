@@ -40,7 +40,7 @@ public class DataRetrievalFutureExample extends Thread{
 	
 	DataRetrievalFutureExample(){
 		cqr = new ConsorsQuoteRetriever();
-		wkn = "11235558";
+		wkn = "11400707";
 		start();
 	}
 	

@@ -627,7 +627,7 @@ public class FinancialLibrary {
     }
 
     /**
-     * calculates the MACD
+     * calculates the MACD, returns as [0] the MACD and as [1] the trigger line
      *
      * @param p1
      * @param p2
