@@ -35,7 +35,7 @@ public class JabberConnection implements TagListener{
 	final static int PREAUTH = 0;
 	final static int INAUTH = 1;
 	final static int AUTHENTICATED = 2;
-	
+
 	int state = PREXML;
 	
 	String localservername;
@@ -44,7 +44,32 @@ public class JabberConnection implements TagListener{
 	String resource = ""; // holds the resource of this connection
 	
 	int priority = 0; // the priority of this connection 
+	String presenceShow, presenceStatus;
 	
+	/**
+	 * @return Returns the presenceShow.
+	 */
+	public String getPresenceShow() {
+		return presenceShow;
+	}
+	/**
+	 * @param presenceShow The presenceShow to set.
+	 */
+	public void setPresenceShow(String presenceShow) {
+		this.presenceShow = presenceShow;
+	}
+	/**
+	 * @return Returns the presenceStatus.
+	 */
+	public String getPresenceStatus() {
+		return presenceStatus;
+	}
+	/**
+	 * @param presenceStatus The presenceStatus to set.
+	 */
+	public void setPresenceStatus(String presenceStatus) {
+		this.presenceStatus = presenceStatus;
+	}
 	String primaryjid = "";
 	Vector secondaryjids = new Vector();
 	
@@ -235,14 +260,31 @@ public class JabberConnection implements TagListener{
 							Element digest = e.getElement("query").getElement("digest");
 							Element hash = e.getElement("query").getElement("hash");
 							Element resource = e.getElement("query").getElement("resource");
-							this.resource = (resource!=null)?resource.getText() : "-";
+							this.resource = (resource!=null)?resource.getText() : "gmx";
 	
 							if(password != null){
 								// ok, 
 								String pwd = password.getText();
-								
 								// TODO: INSERT MAPPING BETWEEN alias@server to customerno
-								this.customerno=Integer.parseInt(username);
+								
+								String domain = e.getAttr("to");
+								String alias = username;
+								String fulladdress = alias+"@"+domain;
+								
+								customerno = a.um.getCustomerno(fulladdress);
+								
+								/*
+								try{
+									this.customerno=Integer.parseInt(username);
+								}
+								catch(Exception ex){
+									// error, therefore bailing out. 
+									ex.printStackTrace();
+									sendError((String)e.attributes.get("id"), "401", "Unauthorized");
+									breakConnection();
+									break;
+								}
+								*/
 								
 								// validate password. 
 								if(a.um.validatePwd(customerno, pwd)){
@@ -252,10 +294,9 @@ public class JabberConnection implements TagListener{
 									sendPositiveAuthentication();
 									_logger.info("User "+customerno+" authenticated. ");
 									state = AUTHENTICATED;
-									
 									// need to obtain the secondary jids for this user
 									this.secondaryjids = a.um.getSecondaryJids(customerno);
-									
+									this.primaryjid = fulladdress;
 								}
 								else{
 									sendError((String)e.attributes.get("id"), "401", "Unauthorized");
@@ -283,7 +324,7 @@ public class JabberConnection implements TagListener{
 					if(e.name.equals("message")){
 //						 checking if a from exists already.
 						if(e.getAttr("from")==null){
-							e.addAttr("from", username+"@gmx.net/"+this.resource);
+							e.addAttr("from", primaryjid+"/"+this.resource);
 						}
 						// 
 						MessageHandler mh = new MessageHandler(this,e);
@@ -292,14 +333,14 @@ public class JabberConnection implements TagListener{
 					else if(e.name.equals("presence")){
 						//
 						if(e.getAttr("from")==null){
-							e.addAttr("from", username+"@gmx.net/"+this.resource);
+							e.addAttr("from", primaryjid+"/"+this.resource);
 						}
 						PresenceHandler ph = new PresenceHandler(this, e);
 						a.pushTagHandler(ph);
 					}
 					else if(e.name.equals("iq")){
 						if(e.getAttr("from")==null){
-							e.addAttr("from", username+"@gmx.net/"+this.resource);
+							e.addAttr("from", primaryjid+"/"+this.resource);
 						}
 						IqHandler iq = new IqHandler(this, e);
 						a.pushTagHandler(iq);
@@ -396,8 +437,6 @@ public class JabberConnection implements TagListener{
 		send(data);
 	}
 	
-	
-	
 	/**
 	 * does a raw send
 	 * @param text
@@ -415,4 +454,72 @@ public class JabberConnection implements TagListener{
 		}
 	}
 	
+	void sendIqAck(String to, String id){
+		String data = "<iq to='"+to+"' type='result' id='"+id+"'/>";
+		send(data);
+	}
+
+	/** 
+	 * sending a single ack 
+	 * @param id
+	 */
+	void sendIqAck(String id){
+		String data = "<iq type='result' id='"+id+"'/>";
+		send(data);
+	}
+	
+	/**
+	 * sending a single subscription mode 
+	 * @param subscription
+	 * @param name
+	 * @param jid
+	 */
+	void sendSingleRosterItem(String subscription, String name, String jid){
+		String data = "<iq type='set'><query xmlns='jabber:iq:roster'>";
+		data += "<item ask='subscribe' subscription='none'";
+		if(name.equals("")){
+			// doing nothing
+		}
+		else{
+			data +=" name='"+name+"'";
+		}
+		data += " jid='"+jid+"'/>";
+		data += "</query></iq>";
+		send(data);
+	}
+	
+	public boolean isLocalAddress(String jid){
+		if(jid.indexOf("@")!=-1){
+			String server = jid.substring(jid.indexOf("@")+1);
+			// TODO: check if the server part is a local part
+			return true;
+		}
+		return true;
+		
+	}
+	
+	public String getUserName(String fulljid){
+		if(fulljid.indexOf("@")!=-1){
+			String ret = fulljid.substring(0, fulljid.indexOf("@"));
+			// TODO: check if the server part is a local part
+			return ret;
+		}
+		return fulljid;
+	}
+	
+	
+	/**
+	 * @return Returns the priority.
+	 */
+	public int getPriority() {
+		return priority;
+	}
+	/**
+	 * @param priority The priority to set.
+	 */
+	public void setPriority(int priority) {
+		this.priority = priority;
+	}
+	
+
 }

@@ -38,7 +38,7 @@ public class Roster {
 	 */
 	Roster(){
 		// actively creating igmxrpc
-		rpcLoadContacts = RPCSax.create("Addressbook","getaddressbycategory");		
+		rpcLoadContacts = RPCSax.create("Addressbook-godtest","getaddressbycategory");		
 	}
 	
 	void load(){
@@ -82,6 +82,42 @@ public class Roster {
 			e.printStackTrace();
 		}
 		
+	}
+	
+	public boolean addContact(String jid, String name){
+		try{
+			// add the contact to both addressbooks. 
+			// TODO: ADDRBOOK must be able to add a single contact
+		}
+		catch(Exception e){
+			e.printStackTrace();
+			return false;
+		}
+		return true;
+	}
+	
+	public boolean removeContact(String jid){
+		try{
+			// add the contact to both addressbooks. 
+			// TODO: ADDRBOOK must be able to remove a single contact
+		}
+		catch(Exception e){
+			e.printStackTrace();
+			return false;
+		}
+		return true;
+	}
+	
+	public boolean updateContact(String jid, String name, Vector groups){
+		try{
+			// add the contact to both addressbooks. 
+			// TODO: ADDRBOOK must be able to update a single contact
+		}
+		catch(Exception e){
+			e.printStackTrace();
+			return false;
+		}
+		return true;
 	}
 	
 	/**

@@ -34,13 +34,42 @@ public class IqHandler implements TagHandler{
 		if(iq.getElement("query")!=null){
 			// obtain the namespace 
 			String xmlns = iq.getElement("query").getAttr("xmlns");
-			if(xmlns.equals("jabber:iq:roster")){
+			if(xmlns.equals("jabber:iq:roster") && iq.getAttr("type").equals("get")){
+				_logger.debug("Working out roster get");
 				// roster requested.
 				sendRoster();
 			}
+			else if(xmlns.equals("jabber:iq:roster") && iq.getAttr("type").equals("set")){
+				// adding user to jid requested
+				_logger.debug("Working out roster set");
+				Roster r = this.jc.a.um.getFullRoster(this.jc.username);
+				String jid = iq.getElement("query").getElement("item").getAttr("jid");
+				String name = iq.getElement("query").getElement("item").getAttr("name");
+				if(jid!=null){
+					if(name==null){
+						name="";
+					}
+					if(r.addContact(jid,name)){
+						// ok, push and ack 
+						String subscription = "none";
+						this.jc.sendSingleRosterItem(subscription, name, jid);
+						this.jc.sendIqAck(iq.getAttr("id"));
+						_logger.debug("added contact.");
+					}
+					else{
+						// send error
+						this.jc.sendError(iq.getAttr("id"), "100", "Error while inserting to database");
+						_logger.debug("error while adding contact");
+					}
+					
+				}
+			}
+			// TODO: add functionality in iq recognition for remove and update contact
+			
 		}
 		else if(iq.getElement("vcard")!=null){
 			// obtain the vcard. 
+			// TODO: update and retreive the vcard
 		}
 	}
 	

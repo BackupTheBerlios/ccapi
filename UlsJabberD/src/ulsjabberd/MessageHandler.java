@@ -39,13 +39,9 @@ public class MessageHandler implements TagHandler{
 					servername = t;
 				}
 			}
-			JabberConnection targetConnection = jc.a.getConnection(username, "");
-			if(targetConnection!=null){
-				targetConnection.send(message.toString());
-			}
-			else{
-				_logger.debug("No local target connection found. ");
-			}
+			this.jc.a.xmlr.route(message);
+			
+			
 		}
 		catch(Exception e){
 			e.printStackTrace();

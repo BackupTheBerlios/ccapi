@@ -24,9 +24,17 @@ import net.gmx.gmxlib.rpc.RPCSax;
 public class UserManager {
 
 	static Logger _logger = Logger.getLogger(UserManager.class);
+	Accepter a;
 	
-	// does the password checking
+	/**
+	 * does the password checking
+	 */
 	RPCSax rpcCheckPwd;
+	
+	/**
+	 * retrieves the customerno 
+	 */
+	RPCSax rpcObtainCustomerno;
 	
 	/** 
 	 * obtains all email addresses
@@ -39,11 +47,13 @@ public class UserManager {
 	/**
 	 * UserManager
 	 */
-	public UserManager(){
+	public UserManager(Accepter a){
+		this.a = a;
 		_logger.info("Starting up user manager. ");
 		// initializing
 		rpcCheckPwd = RPCSax.create("Config","passwd_getPassword");
 		rpcGetEmailAddresses = RPCSax.create("Config", "aliases_getAllAddresses");
+		rpcObtainCustomerno = RPCSax.create("Config", "aliases_getCustomernoForAlias");
 	}
 	/**
 	 * validates a password
@@ -98,29 +108,63 @@ public class UserManager {
 	 * @return 
 	 */
 	public Roster getFullRoster(String username){
-		for(int i=0;i<rosters.size();i++){
+		/*for(int i=0;i<rosters.size();i++){
 			Roster r=(Roster)rosters.elementAt(i);
 			if(r.username.equals(username))return r;
-		}
+		}*/
 		// ok, still in here, need to obtain a new roster
 		Roster ret = new Roster();
 		ret.username=username;
 		ret.load();
+		rosters.add(ret);
 		return ret; 
 	}
-	
+		
+	public void dumpVector(Vector vec){
+		for(int i=0;i<vec.size();i++){
+			Object o = vec.elementAt(i);
+			if(o instanceof RosterEntry){
+				_logger.debug(((RosterEntry)vec.elementAt(i)).jid);	
+			}
+			else if(o instanceof String){
+				_logger.debug(((String)vec.elementAt(i)));
+			}
+		}
+	}
+		
 	/**
-	 * returns the roster with only online users. 
+	 * returns the roster with only online users for a username 
 	 * @param username
 	 * @return
 	 */
 	public Vector getOnlineRoster(String username){
 		Vector ret = new Vector();
-		ret.addElement("uls");
-		ret.addElement("uls2");
+		for(int i=0;i<rosters.size();i++){
+			Roster r=(Roster)rosters.elementAt(i);
+			if(r.username.equals(username)){
+				// check if each contact is online or not. 
+				
+				_logger.debug("Dumping out full roster for "+username);
+				dumpVector(r.entries);
+				
+				// TODO: REALLY IMPLEMENT A BETTER SEARCH ALGORITHM
+				for(int j=0;j<r.entries.size();j++){
+					RosterEntry re = (RosterEntry)r.entries.elementAt(j);
+					if(isOnline(re.jid))ret.add(re.jid);
+				}
+				_logger.debug("Dumping out online roster for "+username);
+				dumpVector(ret);
+				return ret;
+			}
+		}		
 		return ret; 
 	}
 
+	/**
+	 * obtaining the secondary jids for a customerno 
+	 * @param customerno
+	 * @return
+	 */
 	public Vector getSecondaryJids(int customerno){
 		Vector ret = new Vector();
 		try{
@@ -153,6 +197,43 @@ public class UserManager {
 		}
 		return ret;
 	}
+	
+	/**
+	 * 
+	 * @param jid
+	 * @return
+	 */
+	public boolean isOnline(String jid){
+		for(int i=0;i<this.a.connections.size();i++){
+			JabberConnection jc = (JabberConnection) this.a.connections.elementAt(i);
+			if(jc.primaryjid.equals(jid) || jc.secondaryjids.contains(jid))return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * retrieves through gmxrpc a customerno for a full address
+	 * @param fulladdress
+	 * @return
+	 */
+	public int getCustomerno(String fulladdress){
+		try{
+			//
+			this.rpcObtainCustomerno.setParam("alias", fulladdress);
+			this.rpcObtainCustomerno.setParam("domain", "");
+			IGmxRpc answer = rpcObtainCustomerno.invoke();
+			_logger.debug("Data obtained.");
+			_logger.debug(answer.toXML());
+			
+			_logger.debug(""+answer.getInt("customerno"));
+			return answer.getInt("customerno");
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+		return 0;
+	}
+	
 }
 
 

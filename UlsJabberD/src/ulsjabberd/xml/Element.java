@@ -1,7 +1,7 @@
 package ulsjabberd.xml;
 import java.util.Hashtable;
 
-public class Element{
+public class Element implements TagListener{
 
 	public PHashtable attributes;
 	public Vector elements;
@@ -11,6 +11,11 @@ public class Element{
 	public String name="";
 	public boolean closed=false;
 	public Element parent=null;
+	
+	/**
+	 * required for storage ID stuff. 
+	 */
+	public long storageID = -1;
 
 	Element(){
 		attributes=new PHashtable();
@@ -81,4 +86,26 @@ public class Element{
 		return str;
 	}
 
+	
+	
+	public void buildFromString(String input){
+		XMLTagParser xtp = new XMLTagParser();
+		xtp.attach(this);
+		xtp.parse(input);
+	}
+	
+	public void tagStart(Element e){
+		
+	}
+	
+	public void tagStop(Element e){
+		this.attributes=e.attributes;
+		this.elements=e.elements();
+		this.name=e.name;
+		this.parent = e.parent;
+		this.closed = e.closed;
+		this.text=e.text;
+		this.storageID = e.storageID;
+	}
+	
 }

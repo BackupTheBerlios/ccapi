@@ -28,6 +28,8 @@ public class Accepter extends Thread{
 	
 	Vector tagHandlers;
 	
+	XmlRouter xmlr;
+	
 	/**
 	 * plain constructor
 	 * @param s
@@ -49,9 +51,12 @@ public class Accepter extends Thread{
 		// construct the pinger
 		pinger = new Pinger(this);
 		// initializing the user manager
-		um = new UserManager();
+		um = new UserManager(this);
+		// initialize the xml router
+		xmlr = new XmlRouter(this);
 		// initialize the worker threads
 		initializeWorkerThreads();
+		
 		
 		
 	}
@@ -150,19 +155,34 @@ public class Accepter extends Thread{
 	 * @param username
 	 * @return
 	 */
-	public JabberConnection getConnection(String username, String resource){
+	public JabberConnection getConnection(String fulljid, String resource){
+		_logger.debug("Looking for connection to "+fulljid+" / "+resource);
 		int j = connections.size();
+		JabberConnection ret = null;
 		try{
 			for(int i=0;i<j;i++){
 				JabberConnection jc = (JabberConnection)connections.elementAt(i);
-				System.out.println(jc.username+ " - "+username);
-				if(jc.username.equals(username))return jc;
+				_logger.debug("Testing "+jc.primaryjid);
+				if(jc.primaryjid.equalsIgnoreCase(fulljid) && jc.resource.equalsIgnoreCase(resource)){
+					ret = jc;
+					return ret; 
+				}
+				if(jc.primaryjid.equalsIgnoreCase(fulljid) && ret == null){
+					ret = jc;
+				}
+				else if(jc.primaryjid.equalsIgnoreCase(fulljid) && jc.priority > ret.priority){
+					ret = jc;
+				}
+				else if(jc.secondaryjids.contains(fulljid) && ret == null){
+					ret = jc;
+				}
+				
 			}
 		}
 		catch(Exception e){
 			e.printStackTrace();
 		}
-		return null;
+		return ret;
 	}
 	
 }

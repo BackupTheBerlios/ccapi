@@ -292,4 +292,11 @@ public class XMLTagParser {
         closetagname = "";
     }
     public Vector taglisteners = new Vector();
+    
+    public void parse(String input){
+    	for(int i=0;i<input.length();i++){
+    		char c = input.charAt(i);
+    		this.addChar(c);
+    	}
+    }
 }
