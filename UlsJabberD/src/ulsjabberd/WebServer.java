@@ -105,10 +105,26 @@ public class WebServer extends Thread{
 		ret += ("<body>");
 		
 		ret += "<h2>Users online</h2>\n";
-		ret += "Count : "+this.s.a.connections.size()+"<br/>\n";
+		ret += "Count : "+this.s.a.rawConnections.size()+"<br/>\n";
 		
 		ret += "<h2>Packets served</h2>\n";
-		ret += "Count : "+this.s.a.packetsserved+"<br/>\n";
+		ret += "Packet count : "+this.s.a.packetsserved+"<br/>\n";
+		ret += "Message count : "+this.s.a.messagessent+"<br/>\n";
+		
+		ret += "<h1>Online dump</h1>";
+		Set s = this.s.a.connections.keySet();
+		Iterator it = s.iterator();
+		while(it.hasNext()){
+			String jc1 = (String)it.next();
+			JabberConnection jc2 = (JabberConnection)this.s.a.connections.get(jc1);
+			ret+=jc1+" is "+jc2.getPresenceType()+"/"+jc2.getPresenceShow()+"/"+jc2.getPresenceStatus()+"<br/>";
+			//System.out.println(jc1);
+			
+			
+			
+			
+		}
+		
 		
 		ret += ("<h1>Roster dump</h1>");
 		

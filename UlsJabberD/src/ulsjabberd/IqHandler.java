@@ -121,6 +121,19 @@ public class IqHandler implements TagHandler{
 					}
 				}
 			}
+			// work out other namespaces
+			else if(xmlns.equals("http://jabber.org/protocol/disco#items")){
+				// check if the target is the local server
+				if(iq.getAttr("to").indexOf("@")==-1){
+					// ok, local disco - need to return nothing. 
+					String data  ="<iq type='error' from='"+iq.getAttr("to")+"' " +
+							"id='"+iq.getAttr("id")+"' to='"+iq.getAttr("from")+"'>" +
+									"<query xmlns='http://jabber.org/protocol/disco#items'/>" +
+									"<error code='404' type='cancel'><item-not-found xmlns='urn:ietf:xml:params:ns:xmpp-stanzas'/>" +
+									"</error></iq>";
+					this.jc.send(data);
+				}
+			}
 			
 
 			

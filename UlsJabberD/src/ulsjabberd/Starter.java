@@ -12,12 +12,13 @@ import java.io.*;
 import org.apache.log4j.*;
 import org.apache.log4j.xml.DOMConfigurator;
 import com.mysql.*;
+import ulsjabberd.cronservices.*;
 
 public class Starter {
 	
 	static Logger _logger = Logger.getLogger(Starter.class);
 	
-	
+	Clock clock;
 	/**
 	 * @return Returns the config.
 	 */
@@ -55,6 +56,15 @@ public class Starter {
 			// oopening up the webserver
 			ws = new WebServer(this,8080);
 			ws.start();
+			
+			// start the cron clock
+			clock = new Clock(this);
+			
+			Abendjob aj = new Abendjob(this);
+			clock.cronjobs.add(aj);
+			
+			clock.start();
+			
 		}
 		catch(Exception e){
 			_logger.fatal(e);

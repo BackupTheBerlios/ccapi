@@ -21,6 +21,9 @@ public class JabberConnection implements TagListener{
 	Socket s;
 	DataInputStream din;
 	DataOutputStream dout;
+	BufferedReader bin;
+	BufferedWriter bout;
+	
 	
 	/**
 	 * holds the stream id for digesting
@@ -97,7 +100,14 @@ public class JabberConnection implements TagListener{
 		this.a=a;
 		try{
 			din = new DataInputStream(s.getInputStream());
+			
+			
+			bin = new BufferedReader(new InputStreamReader(s.getInputStream(), "UTF8"));
+			
 			dout = new DataOutputStream(s.getOutputStream());
+			bout = new BufferedWriter(new OutputStreamWriter(s.getOutputStream(), "UTF8"));
+
+			
 			xtp = new XMLTagParser();
 			xtp.attach(this);
 		}
@@ -133,12 +143,23 @@ public class JabberConnection implements TagListener{
 	 */
 	public void workOut(){
 		try{
-			int avai = s.getInputStream().available();
-			byte[] bytes = new byte[avai];
-			din.read(bytes, 0, avai);
-			//System.out.println("Read: "+new String(bytes));
-			parseData(bytes);
 			
+			int avai = s.getInputStream().available();
+			//System.out.println(avai);
+			//StringBuffer buffer = new StringBuffer();
+			
+				char[] chars = new char[avai];
+				bin.read(chars, 0, avai);
+				/*int ch;
+				for(int i=0;i<avai;i++){
+					ch = bin.read();
+					//buffer.append((char)ch);
+					xtp.addChar((char)ch);
+				}*/
+				this.parseData(chars);
+			
+			//System.out.println("Read: "+buffer.toString());
+				
 		}
 		catch(Exception e){
 			e.printStackTrace();
@@ -153,6 +174,16 @@ public class JabberConnection implements TagListener{
 	public void parseData(byte[] bytes){
 		for(int i=0;i<bytes.length;i++){
 			xtp.addChar((char)bytes[i]);
+		}
+	}
+	
+	/**
+	 * handing the data to our parser
+	 * @param chars
+	 */
+	public void parseData(char[] chars){
+		for(int i=0;i<chars.length;i++){
+			xtp.addChar(chars[i]);
 		}
 	}
 	
@@ -188,14 +219,18 @@ public class JabberConnection implements TagListener{
 						){
 							_logger.debug("Stream tag recieved, switching state of connection");
 							localservername = (String)e.attributes.get("to");
+							if(localservername.startsWith("192.168.40"))localservername = "gmx.net";
+							
 							// send the stream welcome
 							sendStreamHeader();
 							state = INAUTH;
 							// creating new xml parser for sanitys sake. 
 							xtp.reset();		
 							
+							
 							// setting the domain 
 							domain = e.getAttr("to");
+							if(domain.startsWith("192.168.40"))domain = "gmx.net";
 							
 						}
 						else{
@@ -305,10 +340,14 @@ public class JabberConnection implements TagListener{
 									// ok, user valid. send the welcome
 									sendPositiveAuthentication();
 									_logger.info("User "+customerno+" authenticated. ");
+									
+									
 									state = AUTHENTICATED;
 									// need to obtain the secondary jids for this user
 									this.secondaryjids = a.um.getSecondaryJids(customerno);
 									this.primaryjid = fulladdress;
+									
+									
 								}
 								else{
 									sendError((String)e.attributes.get("id"), "401", "Unauthorized");
@@ -337,11 +376,18 @@ public class JabberConnection implements TagListener{
 									// need to obtain the secondary jids for this user
 									this.secondaryjids = a.um.getSecondaryJids(customerno);
 									this.primaryjid = fulladdress;
+									
+									// add this connection to the connections hashmap
+									this.a.connections.put(Utils.truncateJid(primaryjid), this);
+									
 								}
 								else{
 									sendError((String)e.attributes.get("id"), "401", "Unauthorized");
 									breakConnection();
 								}
+								
+								// ok, user authenticated, push personal welcome ad
+								if(customerno!=0)this.a.vas.sendPersonalWelcomeAd(customerno, this);
 								
 							}
 							else{
@@ -431,7 +477,8 @@ public class JabberConnection implements TagListener{
 	 */
 	public void keepAlive(){
 		try{
-			dout.writeChars("\n");
+			//dout.writeChars("\n");
+			
 		}
 		catch(Exception e){
 			//e.printStackTrace();
@@ -443,8 +490,8 @@ public class JabberConnection implements TagListener{
 	
 	void sendStreamHeader(){
 		streamid = ""+Math.random();
-		//String header = "<?xml version='1.0?>\n";
-		String header = "<stream:stream xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams' from='"+localservername+"' id='"+streamid+"'>";
+		String header = "<?xml version='1.0' encoding='UTF-8' ?>\n";
+		header += "<stream:stream xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams' from='"+localservername+"' id='"+streamid+"'>\n";
 		send(header);
 	}
 	
@@ -481,10 +528,14 @@ public class JabberConnection implements TagListener{
 	void send(String text){
 		try{
 			_logger.debug(">>> "+text);
-			dout.write(text.getBytes());
+			bout.write(text);
+			bout.write("\n");
+			bout.flush();
+			bout.flush();
+			//dout.writeBytes(text);
 		}
 		catch(Exception e){
-			//e.printStackTrace();
+			e.printStackTrace();
 			_logger.debug("Connection not writable");
 			// error when sending keep alive
 			this.breakConnection();
@@ -592,7 +643,7 @@ public class JabberConnection implements TagListener{
 			
 			// 
 			if(jc.getPresenceType().equals("available")){
-				sendPresence(jc.primaryjid+"/"+jc.resource, jc.getPresenceType(), jc.getPresenceShow(), jc.getPresenceStatus());
+				sendPresence(jc.primaryjid+"/"+jc.resource, jc.getPresenceType(), jc.getPresenceStatus(), jc.getPresenceShow());
 			}
 		}
 	}
@@ -641,6 +692,10 @@ public class JabberConnection implements TagListener{
 		this.send(data);
 	}
 	
+	
+	public BufferedReader getBin(){
+		return bin;
+	}
 	
 	/**
 	 * @return Returns the din.

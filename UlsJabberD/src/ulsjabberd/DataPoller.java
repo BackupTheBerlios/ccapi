@@ -22,20 +22,28 @@ public class DataPoller extends Thread{
 			
 			// need to
 			try{
-				int j = a.connections.size(); 
+				int j = a.rawConnections.size(); 
 				for(int i=0;i<j;i++){
-					JabberConnection jc=(JabberConnection)a.connections.elementAt(i);
-					//System.out.println("Stream "+i+": "+jc.getS().getInputStream().available());
-					if( jc.getDin().available()>0){
-						// do the actual data parsing.
-						jc.workOut();
+					
+					JabberConnection jc=(JabberConnection)a.rawConnections.elementAt(i);
+					try{
+						//System.out.println("Stream "+i+": "+jc.getS().getInputStream().available());
+						if( jc.getDin().available()>0){
+							// do the actual data parsing.
+							jc.workOut();
+						}
+					}
+					catch(Exception e){
+						e.printStackTrace();
+						this.a.removeConnection(jc);
 					}
 				}
 				
-				sleep(100);
+				sleep(10);
 				
 			}
 			catch(Exception e){
+				
 				e.printStackTrace();
 			}
 		}

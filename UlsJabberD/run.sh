@@ -1,0 +1,1 @@
+java -classpath .:./bin:./lib/mysql-connector-java-3.1.7-bin.jar:./lib/gmxlib-1.2.jar:./lib/cryptix-jce-tests.jar:./lib/cryptix-jce-compat.jar:./lib/cryptix-jce-provider.jar:./lib/cryptix-jce-api.jar:./lib/log4j-1.2.9.jar ulsjabberd.Starter

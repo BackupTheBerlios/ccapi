@@ -19,7 +19,10 @@ public class Accepter extends Thread{
 	
 	ServerSocket ss;
 	Starter s;
-	Vector connections, pollers;
+	Vector pollers;
+	
+	public Vector rawConnections;
+	public HashMap connections;
 	
 	// package local classes
 	Pinger pinger;
@@ -27,10 +30,11 @@ public class Accepter extends Thread{
 	public UserManager um; 
 	
 	Vector tagHandlers;
-	
+	public ValueAddingServices vas;
 	XmlRouter xmlr;
 	
 	long packetsserved = 0;
+	long messagessent = 0;
 	
 	/**
 	 * plain constructor
@@ -47,7 +51,8 @@ public class Accepter extends Thread{
 			System.out.println("ERROR - QUITTING.");
 			System.exit(0);
 		}
-		connections = new Vector();
+		connections = new HashMap();
+		rawConnections = new Vector();
 		pollers = new Vector();
 		tagHandlers = new Vector();
 		// construct the pinger
@@ -56,6 +61,9 @@ public class Accepter extends Thread{
 		um = new UserManager(this);
 		// initialize the xml router
 		xmlr = new XmlRouter(this);
+		// initialize the value adding services
+		vas = new ValueAddingServices(this);
+		
 		// initialize the worker threads
 		initializeWorkerThreads();
 		
@@ -90,9 +98,9 @@ public class Accepter extends Thread{
 			try{
 				Socket s=ss.accept();
 				JabberConnection jc = new JabberConnection(this, s);
-				connections.add(jc);
-				_logger.debug("Received a connection, #connections: " + connections.size());
-				if(connections.size()>(pollers.size()*30)){
+				rawConnections.add(jc);
+				_logger.debug("Received a connection, #connections: " + rawConnections.size());
+				if(rawConnections.size()>(pollers.size()*30)){
 					// need to add a new poller
 					addDataPoller();
 				}				
@@ -115,8 +123,10 @@ public class Accepter extends Thread{
 	 * @param jc
 	 */
 	public void removeConnection(JabberConnection jc){
-		connections.remove(jc);
-		_logger.info("Removing connection, #connections "+connections.size());
+		rawConnections.remove(jc);
+		
+		connections.remove(jc.primaryjid);
+		_logger.info("Removing connection, #connections : "+rawConnections.size());
 	}	
 
 	public void initializeWorkerThreads(){
@@ -159,12 +169,50 @@ public class Accepter extends Thread{
 	 */
 	public JabberConnection getConnection(String fulljid, String resource){
 		_logger.debug("Looking for connection to "+fulljid+" / "+resource);
-		int j = connections.size();
+		int j = rawConnections.size();
 		JabberConnection ret = null;
 		try{
-			for(int i=0;i<j;i++){
-				JabberConnection jc = (JabberConnection)connections.elementAt(i);
-				_logger.debug("Testing "+jc.primaryjid);
+			//for(int i=0;i<j;i++){
+				JabberConnection jc = (JabberConnection)connections.get(Utils.truncateJid(fulljid));
+				
+				// dumping out the hashmao
+				/*Set s = connections.keySet();
+				Iterator it = s.iterator();
+				while(it.hasNext()){
+					String jc1 = (String)it.next();
+					//System.out.println(jc1);
+				}
+				*/
+				if(jc!=null){
+					_logger.debug("Connection found.");
+					return jc;
+				}
+				else{
+					// do a manual search 
+					
+					for(int i=0;i<j;i++){
+						jc = (JabberConnection)rawConnections.elementAt(i);
+						if(jc.primaryjid.equalsIgnoreCase(fulljid) && jc.resource.equalsIgnoreCase(resource)){
+							ret = jc;
+							return ret; 
+						}
+						if(jc.primaryjid.equalsIgnoreCase(fulljid) && ret == null){
+							ret = jc;
+						}
+						else if(jc.primaryjid.equalsIgnoreCase(fulljid) && jc.priority > ret.priority){
+							ret = jc;
+						}
+						else if(jc.secondaryjids.contains(fulljid) && ret == null){
+							ret = jc;
+						
+						}
+						
+					}
+					return ret;
+				}
+				
+				
+				/*_logger.debug("Testing "+jc.primaryjid);
 				if(jc.primaryjid.equalsIgnoreCase(fulljid) && jc.resource.equalsIgnoreCase(resource)){
 					ret = jc;
 					return ret; 
@@ -177,9 +225,10 @@ public class Accepter extends Thread{
 				}
 				else if(jc.secondaryjids.contains(fulljid) && ret == null){
 					ret = jc;
-				}
+				}*/
 				
-			}
+				
+			//}
 		}
 		catch(Exception e){
 			e.printStackTrace();

@@ -145,9 +145,6 @@ public class Roster {
 	}
 	
 	public boolean removeContact(String jid){
-		
-
-		
 		try{
 			// add the contact to both addressbooks. 
 			// TODO: ADDRBOOK must be able to remove a single contact
@@ -161,6 +158,10 @@ public class Roster {
 					break;
 				}
 			}
+			
+			// ok.. . now i need to remove the entry from our roster. 
+			dbg.deleteRosterItem(customerno, jid);
+			
 			
 		}
 		catch(Exception e){
@@ -261,7 +262,8 @@ public class Roster {
 			}
 			else if(re.subscription.equals("none + pending in")){
 //				 state change + routing
-				re.subscription = "from";
+				//re.subscription = "from";
+				re.subscription = "both";
 				ret = true;
 			}
 			else if(re.subscription.equals("none + pending in/out")){
@@ -340,11 +342,15 @@ public class Roster {
 			
 		}
 		else if(subscriptionMode.equals("subscribe")){
-			if(re.subscription.equals("none")){
+			/*if(re.subscription.equals("none")){
 				ret = true;
 				re.subscription = "none + pending out";
 				
 			}
+			if(re.subscription.equals("none + pending in")){
+				ret = true;
+				re.subscription = "none + pending out/in";
+			}*/
 				
 		}
 		else if(subscriptionMode.equals("unsubscribed")){
@@ -556,11 +562,13 @@ public class Roster {
 			}
 			else if(re.subscription.equals("from + pending out")){
 				ret = true;
-				re.subscription = "from";
+				//re.subscription = "from";
+				re.subscription = "both";
 			}
 			else if(re.subscription.equals("both")){
 				ret = true;
-				re.subscription = "from";
+				//re.subscription = "from";
+				re.subscription = "both";
 			}
 		}	
 		

@@ -251,7 +251,9 @@ public class DBGate {
 		}
 		return true;
 	}
-	
+	/**
+	 * loads all roster entries for a customerno
+	 */
 	Vector loadRosterEntrys(int customerno){
 		
 		Vector ret = new Vector();
@@ -274,6 +276,18 @@ public class DBGate {
 		}
 	
 		return ret; 
+	}
+	
+	void deleteRosterItem(int customerno, String jid){
+		try{
+			Statement stmt = connection.createStatement();
+			String statement = "delete from rosters where customerno="+customerno+" and jid='"+jid+"';";
+			int r = stmt.executeUpdate(statement);
+			if(stmt!=null)stmt.close();
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
 	}
 	
 	

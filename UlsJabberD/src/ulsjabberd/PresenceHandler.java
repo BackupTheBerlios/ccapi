@@ -31,7 +31,7 @@ public class PresenceHandler implements TagHandler {
 	public void handle() {
 		boolean deliver = true;
 		try{
-			System.out.println("Working out presence tag : "+presence.toString());
+		    _logger.debug("Working out presence tag : "+presence.toString());
 			boolean routeGlobal = true;;
 			
 			if(presence.getAttr("to")!=null){
@@ -72,9 +72,7 @@ public class PresenceHandler implements TagHandler {
 						
 //						 ok, user accepted subscription request 
 						// need to do update the roster entries
-						
-						
-
+				
 						// ok, need to check if the target is an onserver contact 
 						// if so, do some special handling
 						Roster r = this.jc.a.um.getRoster(this.jc.customerno); 
@@ -85,8 +83,6 @@ public class PresenceHandler implements TagHandler {
 							deliver = false;
 						}
 						this.jc.a.um.setRoster(jc.customerno, r);
-
-						
 
 						// need to do a roster push
 						RosterEntry re = r.getRosterEntry(truncatedJid);
@@ -129,11 +125,6 @@ public class PresenceHandler implements TagHandler {
 					}
 					else if(presence.getAttr("type").equals("unsubscribed")){
 						//
-
-						
-						
-						
-						
 
 //						 need to stamp the presence tag with the bare jid. 
 						presence.attributes.put("to", Utils.truncateJid(presence.getAttr("to")));
@@ -186,7 +177,7 @@ public class PresenceHandler implements TagHandler {
 					if(jc.getPresenceType().equals("unavailable")){
 						/// TODO: need to close the connection. 	
 						// TODO: need to do a presence push.
-						
+						this.jc.a.removeConnection(jc);
 					}
 				}
 				else{
@@ -209,8 +200,6 @@ public class PresenceHandler implements TagHandler {
 					presence.attributes.put("to", s);
 					this.jc.a.xmlr.route(presence);
 				}
-			
-				
 			}
 		}
 		catch(Exception e){

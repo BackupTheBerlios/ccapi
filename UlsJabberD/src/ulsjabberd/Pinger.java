@@ -24,10 +24,10 @@ public class Pinger extends Thread{
 		while(true){
 			
 			// iterate over the connections and send a nop.
-			int n = a.connections.size();
+			int n = a.rawConnections.size();
 			for(int i=0;i<n;i++){
 				try{
-					JabberConnection jc = (JabberConnection)a.connections.elementAt(i);
+					JabberConnection jc = (JabberConnection)a.rawConnections.elementAt(i);
 					if(jc!=null){
 						// send a keep alive
 						jc.keepAlive();

@@ -52,7 +52,9 @@ public class XMLTagParser {
     String closetagname = "";
 
     public void addChar(char c1) {
-        String c = "" + c1;
+        
+    	String c = "" + c1;
+    	//System.out.println("IN: "+c);
         if (c.equals("\\")) {
             if (state == S8) cdata += c;
         }

@@ -121,7 +121,7 @@ public class UserManager {
 			
 		}
 		catch(Exception e){
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 		return false;
 	}
@@ -249,10 +249,10 @@ public class UserManager {
 	 * @return
 	 */
 	public boolean isOnline(String jid){
-		for(int i=0;i<this.a.connections.size();i++){
-			JabberConnection jc = (JabberConnection) this.a.connections.elementAt(i);
-			if(jc.primaryjid.equals(jid) || jc.secondaryjids.contains(jid))return true;
-		}
+		
+		JabberConnection jc = (JabberConnection) this.a.connections.get(jid);
+		if(jc!=null)if(jc.primaryjid.equals(jid) || jc.secondaryjids.contains(jid))return true;
+		
 		return false;
 	}
 	

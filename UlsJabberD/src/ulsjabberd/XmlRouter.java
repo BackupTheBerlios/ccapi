@@ -159,7 +159,7 @@ public class XmlRouter {
 	
 	Vector getAllLocalJabberConnections(String jid){
 		Vector ret = new Vector();
-		try{
+		/*try{
 			for(int i=0;i<this.a.connections.size();i++){
 				JabberConnection jc = (JabberConnection)this.a.connections.elementAt(i);
 				if(jc.secondaryjids.contains(jid))ret.add(jc);
@@ -167,7 +167,10 @@ public class XmlRouter {
 		}
 		catch(Exception e){
 			e.printStackTrace();
-		}
+		}*/
+		
+		JabberConnection jc = (JabberConnection)this.a.connections.get(jid);
+		if(jc!=null)ret.add(jc);
 		return ret;	
 	}
 	
