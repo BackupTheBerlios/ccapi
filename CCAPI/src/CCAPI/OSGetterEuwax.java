@@ -8,10 +8,7 @@ import org.htmlparser.visitors.*;
 import org.htmlparser.tags.*;
 
 
-class OSGetterEuwax{
-	OSGetterEuwax(){
-		
-	}
+public class OSGetterEuwax{
 
 	public String getKODax(String type, double from, double to){
 		
@@ -47,6 +44,6 @@ class OSGetterEuwax{
 
 	public static void main(String[] args){
 		OSGetterEuwax o=new OSGetterEuwax();
-		o.getKOCallDax("call", 4000,4000);
+		o.getKODax("call", 4000.0,4000.0);
 	}
 }

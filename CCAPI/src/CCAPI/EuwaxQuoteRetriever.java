@@ -13,10 +13,10 @@ public class EuwaxQuoteRetriever {
     EuwaxQuoteRetriever() {
     }
 
-    public double retrieveAsk(String wkn) {
+    public double[] retrievePrice(String wkn) {
         System.gc();
 
-        double value = 0.0;
+        double[] value = new double[2];
 
         try {
             URL u = new URL(
@@ -59,7 +59,8 @@ public class EuwaxQuoteRetriever {
                     ask = ask.replaceAll(",", ".");
                     bid = bid.replaceAll(",", ".");
 
-                    value = Double.parseDouble(ask);
+                    value[1] = Double.parseDouble(ask);
+		    value[0] = Double.parseDouble(bid);
                 }
 
                 l = din.readLine();
