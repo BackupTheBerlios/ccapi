@@ -3,20 +3,40 @@
 <project default="deploy">
 <target name="deploy">
 
+	<!-- The caution message -->
+	<echo>
+CAUTION! In case of build errors:
+* modify build.xml to reflect your dev environment!
+* Especially jsse.jar is required (bundled with j2se1.4+) 
+  and path to jsse.jar is set hard in build.xml
+	
+(c) ulrich staudinger, 2002 - 2004, Giveaway under the hood of GPL.
+	</echo>
+
 
 	<!-- compile to local bin folder -->
 	<javac 
 	     srcdir="src"
 	     destdir="bin"
+		 classpath="/opt/j2sdk1.4.1_02/jre/lib/jsse.jar"
+		 nowarn="on"	
 	/>	
 
 	<!-- compile to another project tree -->
-	<javac srcdir="src" destdir="../../GlobalMarketScreener/bin"/>
+	<javac 
+		 srcdir="src" 
+		 destdir="../../GlobalMarketScreener/bin"
+		 classpath="/opt/j2sdk1.4.1_02/jre/lib/jsse.jar"	
+		 nowarn="on"
+	/>
 
 	<!-- package binary release. -->
 	<!-- The jar file is called 10_xyz for use with jboss. -->
-	<!-- jboss has a special deployment filter to organize load order. ..>
-	<jar destfile="10_CCAPI.jar" compress="false">
+	<!-- jboss has a special deployment filter to organize load order. -->
+	<jar 
+		 destfile="10_CCAPI.jar"
+		 compress="false"
+	>
 		 <fileset dir="bin"/>
 	</jar>
 
@@ -25,7 +45,7 @@
 	<zip 
 	     destfile="./ccapi-release.zip" 
 		 basedir="."
-		 excludes="release_batch.sh"
+		 excludes="release_batch.sh, ccapi-release.zip"
 	/>
 
 </target>
