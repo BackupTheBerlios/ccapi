@@ -13,7 +13,7 @@ public class EuwaxQuoteRetriever {
     EuwaxQuoteRetriever() {
     }
 
-    public double[] retrievePrice(String wkn) {
+    public double[] retreiveQuote(String wkn) {
         System.gc();
 
         double[] value = new double[2];
