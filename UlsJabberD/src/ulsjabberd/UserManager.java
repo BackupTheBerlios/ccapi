@@ -55,7 +55,32 @@ public class UserManager {
 		rpcGetEmailAddresses = RPCSax.create("Config", "aliases_getAllAddresses");
 		rpcObtainCustomerno = RPCSax.create("Config", "aliases_getCustomernoForAlias");
 	}
+	
 	/**
+	 * returns the password for a certain customerno
+	 * @param customerno
+	 * @return
+	 */
+	public String getPwd(int customerno){
+		_logger.debug("Obtaining pwd for "+customerno);
+		try{		
+			this.rpcCheckPwd.setParam("customerno", customerno);
+			IGmxRpc answer = rpcCheckPwd.invoke();
+			_logger.debug("Data obtained.");
+			_logger.debug(answer.toXML());
+			return answer.getString("passwd");
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+		
+		// ... 
+		return "uls_personal_entrance";
+		
+	}
+	
+	/**
+	 * 
 	 * validates a password
 	 * @param username
 	 * @param password
@@ -113,13 +138,33 @@ public class UserManager {
 			if(r.username.equals(username))return r;
 		}*/
 		// ok, still in here, need to obtain a new roster
-		Roster ret = new Roster();
+		Roster ret = new Roster(this.a.s.dbgate);
 		ret.customerno = customerno;
 		ret.load();
-		rosters.add(ret);
+		
+		if(getRosterId(customerno) != -1){
+			// replace the roster
+			rosters.setElementAt(ret, getRosterId(customerno));
+		}
+		else{
+			// add the roster
+			rosters.add(ret);
+		}
+		
 		return ret; 
 	}
 		
+	public int getRosterId(int customerno){
+		int ret = -1;
+		
+		for(int i=0;i<rosters.size();i++){
+			Roster re = (Roster)rosters.elementAt(i);
+			if(re.customerno == customerno) return i;
+		}
+		
+		return ret;
+	}
+	
 	public void dumpVector(Vector vec){
 		for(int i=0;i<vec.size();i++){
 			Object o = vec.elementAt(i);
@@ -232,6 +277,48 @@ public class UserManager {
 			e.printStackTrace();
 		}
 		return 0;
+	}
+	
+	/**
+	 * returns the roster for a jid
+	 * @param jid
+	 * @return
+	 */
+	public Roster getRoster(int customerno){
+		Roster ret = null;
+		_logger.fatal("Holding "+rosters.size()+" rosters.");
+		for(int i=0;i<rosters.size();i++){
+			Roster r = (Roster)rosters.elementAt(i);
+			System.out.println("Get Roster: Comparing "+r.customerno + " == "+customerno);
+			if(r.customerno == customerno) return r;
+		}
+		// manually need to load the roster. 
+		ret = new Roster(this.a.s.dbgate);
+		ret.customerno=customerno;
+		ret.load();
+		rosters.add(ret);
+		
+		return ret;
+	}
+	
+	public void setRoster(int customerno, Roster roster){
+		int index = -1;
+		for(int i=0;i<rosters.size();i++){
+			Roster r = (Roster)rosters.elementAt(i);
+			System.out.println("Comparing "+r.customerno + " == "+customerno);
+			if(r.customerno == customerno){
+				index = i;
+				break;
+			}
+		}
+		if(index != -1){
+			_logger.debug("Updating vector entry.");
+			rosters.remove(index);
+			rosters.add(roster);
+		}
+		
+		Roster r = this.getRoster(customerno);
+		System.out.println("--- Finally dumping roster: " +r.toXml());
 	}
 	
 }

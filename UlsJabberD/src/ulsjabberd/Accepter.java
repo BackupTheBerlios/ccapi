@@ -119,7 +119,7 @@ public class Accepter extends Thread{
 
 	public void initializeWorkerThreads(){
 		workerThreads = new Vector();
-		for(int i=0;i<5;i++){
+		for(int i=0;i<1;i++){
 			TagHandlerWorkerThread thwt = new TagHandlerWorkerThread(this);
 			workerThreads.add(thwt);
 			thwt.start();
@@ -183,6 +183,15 @@ public class Accepter extends Thread{
 			e.printStackTrace();
 		}
 		return ret;
+	}
+	
+	/**
+	 * returns all JabberConnection objects for one particular user
+	 * @param truncatedJid
+	 * @return
+	 */
+	public Vector getConnections(String truncatedJid){
+		return null;
 	}
 	
 }

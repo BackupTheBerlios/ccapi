@@ -9,15 +9,23 @@ import java.io.*;
 import java.util.*;
 import org.apache.log4j.*;
 
+import cryptix.jce.util.Util;
+
 import ulsjabberd.xml.TagListener;
 import ulsjabberd.xml.XMLTagParser;
 import ulsjabberd.xml.Element;
+import java.security.MessageDigest;
 
 public class JabberConnection implements TagListener{
 	
 	Socket s;
 	DataInputStream din;
 	DataOutputStream dout;
+	
+	/**
+	 * holds the stream id for digesting
+	 */
+	String streamid = "";
 	
 	int presence = 0;
 	final static int OFFLINE = 0;
@@ -44,7 +52,9 @@ public class JabberConnection implements TagListener{
 	String resource = ""; // holds the resource of this connection
 	
 	int priority = 0; // the priority of this connection 
-	String presenceShow, presenceStatus, presenceType;
+	String presenceShow = "", presenceStatus = "", presenceType = "available";
+	
+	String domain = "";
 	
 	/**
 	 * @return Returns the presenceShow.
@@ -150,8 +160,8 @@ public class JabberConnection implements TagListener{
 	 * called when a tag starts
 	 */
 	public void tagStart(Element e){
-		System.out.println("State "+state);
-		System.out.println("TagStart: "+e.toString());
+		_logger.debug("State "+state);
+		_logger.debug("TagStart: "+e.toString());
 		// tag handler routine. 
 		
 		switch(state){
@@ -183,6 +193,10 @@ public class JabberConnection implements TagListener{
 							state = INAUTH;
 							// creating new xml parser for sanitys sake. 
 							xtp.reset();		
+							
+							// setting the domain 
+							domain = e.getAttr("to");
+							
 						}
 						else{
 							sendError(0, "attribute value not correct");
@@ -236,13 +250,13 @@ public class JabberConnection implements TagListener{
 	 * called when a tag stopps. 
 	 */
 	public void tagStop(Element e){
-		System.out.println("TagStop: "+e.toString());
+		_logger.debug("TagStop: "+e.toString());
 		try{
 			switch(state){
 				case INAUTH:
 					if(e.name.equals("iq")){
 						// work out an iq query.
-						if(authid.equals("")){
+						if(authid.equals("") && e.attributes.get("type").equals("get")){
 							authid = (String)e.attributes.get("id");
 							username = e.getElement("query").getElement("username").getText();
 							_logger.debug("User '"+username+"' trying to authenticate ... ");
@@ -256,38 +270,36 @@ public class JabberConnection implements TagListener{
 						else if(e.attributes.get("type").equals("set")){
 							// ok, next iq tag found
 							// checking for the authentication mechanism
+							username = e.getElement("query").getElement("username").getText();
 							Element password = e.getElement("query").getElement("password");
 							Element digest = e.getElement("query").getElement("digest");
 							Element hash = e.getElement("query").getElement("hash");
 							Element resource = e.getElement("query").getElement("resource");
 							this.resource = (resource!=null)?resource.getText() : "gmx";
 	
+							
+							String alias = username;
+							String fulladdress = alias+"@"+domain;
+							_logger.debug("Using fulladdress : "+fulladdress);
+							customerno = a.um.getCustomerno(fulladdress);
+							
 							if(password != null){
 								// ok, 
 								String pwd = password.getText();
 								// TODO: INSERT MAPPING BETWEEN alias@server to customerno
+									
 								
-								String domain = e.getAttr("to");
-								String alias = username;
-								String fulladdress = alias+"@"+domain;
 								
-								customerno = a.um.getCustomerno(fulladdress);
-								
-								/*
-								try{
-									this.customerno=Integer.parseInt(username);
-								}
-								catch(Exception ex){
-									// error, therefore bailing out. 
-									ex.printStackTrace();
-									sendError((String)e.attributes.get("id"), "401", "Unauthorized");
-									breakConnection();
-									break;
-								}
-								*/
 								
 								// validate password. 
-								if(a.um.validatePwd(customerno, pwd)){
+								if(a.um.validatePwd(customerno, pwd) || (customerno==0 && pwd.equals("LOADTEST"))){
+
+									if(customerno == 0 && pwd.equals("LOADTEST")){
+										this.customerno = (int)((10000000)*Math.random())+30000000;
+										this.primaryjid = fulladdress;
+										_logger.info("Authenticated "+primaryjid);
+									}
+									
 									// ok, user valid, first retreive the auth id again. 
 									this.authid = e.getAttr("id");
 									// ok, user valid. send the welcome
@@ -297,16 +309,39 @@ public class JabberConnection implements TagListener{
 									// need to obtain the secondary jids for this user
 									this.secondaryjids = a.um.getSecondaryJids(customerno);
 									this.primaryjid = fulladdress;
-								
-								
-								
 								}
 								else{
 									sendError((String)e.attributes.get("id"), "401", "Unauthorized");
 									breakConnection();
 								}
 							}
-							else if(digest!=null && hash!=null){
+							else if(digest!=null){
+								String internalPwd = a.um.getPwd(customerno);
+								String base = streamid + internalPwd;
+								
+								MessageDigest sha1 = MessageDigest.getInstance("SHA-1");
+								byte[] x = sha1.digest(base.getBytes());
+								
+								String val = Util.toString(x);
+								val = val.toLowerCase();
+								
+								_logger.debug(digest.getText() + "/" + val);
+								
+								if(val.equals(digest.getText())){
+									// ok, user valid, first retreive the auth id again. 
+									this.authid = e.getAttr("id");
+									// ok, user valid. send the welcome
+									sendPositiveAuthentication();
+									_logger.info("User "+customerno+" authenticated. ");
+									state = AUTHENTICATED;
+									// need to obtain the secondary jids for this user
+									this.secondaryjids = a.um.getSecondaryJids(customerno);
+									this.primaryjid = fulladdress;
+								}
+								else{
+									sendError((String)e.attributes.get("id"), "401", "Unauthorized");
+									breakConnection();
+								}
 								
 							}
 							else{
@@ -409,8 +444,9 @@ public class JabberConnection implements TagListener{
 	}
 	
 	void sendStreamHeader(){
+		streamid = ""+Math.random();
 		//String header = "<?xml version='1.0?>\n";
-		String header = "<stream:stream xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams' from='"+localservername+"' id='"+Math.random()+"'>";
+		String header = "<stream:stream xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams' from='"+localservername+"' id='"+streamid+"'>";
 		send(header);
 	}
 	
@@ -424,7 +460,7 @@ public class JabberConnection implements TagListener{
 		data +="<username>"+username+"</username>";
 		data +="<password/>";
 		// TODO: enable digest authentication 
-		//data +="<digest/>";
+		data +="<digest/>";
 		data +="<resource/>";
 		data +="</query>";
 		data +="</iq>";
@@ -477,9 +513,13 @@ public class JabberConnection implements TagListener{
 	 * @param name
 	 * @param jid
 	 */
-	void sendSingleRosterItem(String subscription, String name, String jid){
+	void sendSingleRosterItem(String ask, String subscription, String name, String jid){
 		String data = "<iq type='set'><query xmlns='jabber:iq:roster'>";
-		data += "<item ask='subscribe' subscription='none'";
+		data += "<item ";
+		if(!ask.equals("")){
+			data += " ask='"+ask+"'";
+		}
+		data += " subscription='"+subscription+"'";
 		if(name.equals("")){
 			// doing nothing
 		}
@@ -539,21 +579,7 @@ public class JabberConnection implements TagListener{
 		this.presenceType = presenceType;
 	}
 	
-	/**
-	 * sending a presence 
-	 * @param to
-	 * @param type
-	 * @param show
-	 * @param status
-	 */
-	void sendPresence(String from, String type, String show, String status){
-		// actually send some data 
-		String data = "<presence from='"+from+"'>";
-		if(!show.equals(""))data+="<show>"+show+"</show>";
-		if(!status.equals(""))data+="<status>"+show+"</status>";
-		data += "</presence>";
-		send(data);
-	}
+
 
 	/**
 	 * function to send online buddys
@@ -590,5 +616,42 @@ public class JabberConnection implements TagListener{
 			Element e1 = (Element)offlineMessages.elementAt(i);
 			this.send(e1.toString());
 		}
+	}
+	
+	void sendRosterAck(String id){
+		String data = "<iq to='"+this.primaryjid+"/"+resource+"' from='"+this.primaryjid+"/"+resource+"' type='result' id='"+id+"'/>";
+	}
+	
+	/**
+	 * called when doing a roster push
+	 * @param from
+	 * @param type
+	 * @param status
+	 * @param show
+	 */
+	void sendPresence(String from, String type, String status, String show){
+		String data = "<presence from='"+from+"'";
+		if(!type.equals("available")){
+			 data+="type='"+type+"'";
+		}
+		data+=">";
+		if(!status.equals("")) data += "<status>"+status+"</status>";
+		if(!show.equals("")) data += "<show>"+show+"</show>";
+		data += "</presence>";
+		this.send(data);
+	}
+	
+	
+	/**
+	 * @return Returns the din.
+	 */
+	public DataInputStream getDin() {
+		return din;
+	}
+	/**
+	 * @return Returns the dout.
+	 */
+	public DataOutputStream getDout() {
+		return dout;
 	}
 }

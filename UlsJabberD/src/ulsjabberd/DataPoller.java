@@ -26,7 +26,7 @@ public class DataPoller extends Thread{
 				for(int i=0;i<j;i++){
 					JabberConnection jc=(JabberConnection)a.connections.elementAt(i);
 					//System.out.println("Stream "+i+": "+jc.getS().getInputStream().available());
-					if(jc.getS().getInputStream().available()>0){
+					if( jc.getDin().available()>0){
 						// do the actual data parsing.
 						jc.workOut();
 					}

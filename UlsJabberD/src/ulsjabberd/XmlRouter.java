@@ -32,18 +32,97 @@ public class XmlRouter {
 		try{
 			_logger.debug("Routing:  "+chunk.toString());
 			String truncatedTo = chunk.getAttr("to");
+			String truncatedFrom = chunk.getAttr("from");
 			String resource = "";
+			String resourceFrom = "";
 			if(truncatedTo.indexOf("/")!=-1){
 				truncatedTo = truncatedTo.substring(0, truncatedTo.indexOf("/"));
 				resource = truncatedTo.substring(truncatedTo.indexOf("/")+1);
 			}
+			
+			if(truncatedFrom.indexOf("/")!=-1){
+				truncatedFrom = truncatedFrom.substring(0, truncatedFrom.indexOf("/"));
+				resourceFrom = truncatedFrom.substring(truncatedFrom.indexOf("/")+1);
+			}
+			
 			// in case of presence we need to dispatch to all targets.
 			if(chunk.name.equals("presence")){
-				Vector v = getAllLocalJabberConnections(truncatedTo);
-				for(int i=0;i<v.size();i++){
-					JabberConnection jc = (JabberConnection)v.elementAt(i);
-					chunk.attributes.put("to", chunk.attributes.get("to")+"/"+jc.resource);
-					jc.send(chunk.toString());
+				
+				_logger.debug("***** Filtering inbound traffic.");
+				boolean deliver = true;
+				// need to check for the incoming presence subscriptions (see rfc 3921)
+				if(chunk.getAttr("type")!=null){
+					if(	chunk.getAttr("type").equals("subscribe") || 
+						chunk.getAttr("type").equals("subscribed") ||
+						chunk.getAttr("type").equals("unsubscribe") ||
+						chunk.getAttr("type").equals("unsubscribed") 
+					){
+						// need to obtain the customerno for our truncatedTo
+						int customerno = a.um.getCustomerno(truncatedTo);
+						System.out.println(" --- obtaining roster ");
+						Roster r = this.a.um.getRoster(customerno);
+						
+						if(!r.setSubscriptionModeInbound(truncatedFrom, chunk.getAttr("type"))){
+							deliver = false;
+							_logger.debug("DROPPING INBOUND PACKET !!!!! ");
+						}
+						
+						//r.setSubscriptionModeInbound(truncatedFrom, chunk.getAttr("type"));
+						System.out.println(" --- setting roster ");
+						this.a.um.setRoster(customerno, r);
+						System.out.println(" --- set");
+						//r.setSubscriptionModeInbound(truncatedFrom, chunk.getAttr("type"));
+
+						// need to do a roster push
+						RosterEntry re = r.getRosterEntry(truncatedFrom);
+						
+						
+					
+						Vector v = getAllLocalJabberConnections(truncatedTo);
+						for(int i=0;i<v.size();i++){
+							JabberConnection jc = (JabberConnection)v.elementAt(i);
+							jc.sendSingleRosterItem("", re.subscription, re.displayname, truncatedFrom);	
+						
+						}
+						
+						if(chunk.getAttr("type").equals("subscribed")){
+							// doing a presence push.
+							
+/*							JabberConnection jcFrom = a.getConnection(truncated, "");
+							// TODO: need to do a presence push! 
+							if(jcFrom!=null){
+								jc.sendPresence(truncatedJid, "available", jcFrom.getPresenceStatus(), jcFrom.getPresenceShow());
+							}*/
+							
+						}
+
+					}
+				}
+
+				if(deliver){
+					Vector v = getAllLocalJabberConnections(truncatedTo);
+					for(int i=0;i<v.size();i++){
+						JabberConnection jc = (JabberConnection)v.elementAt(i);
+						
+						//chunk.attributes.put("to", chunk.attributes.get("to")+"/"+jc.resource);
+						chunk.attributes.put("to", chunk.attributes.get("to"));
+						jc.send(chunk.toString());
+					}
+					
+					// in case there are no local connections i need to check if this is a subscribe request
+					if(v.size()==0){
+						if(chunk.getAttr("type")!=null){
+							if(	chunk.getAttr("type").equals("subscribe") || 
+								chunk.getAttr("type").equals("subscribed")){
+								
+								this.a.s.dbgate.storeHistoricEntry(chunk);
+								
+							}
+						}
+					}
+				}
+				else{
+					_logger.debug("NOT DELIVERING.");
 				}
 			}
 			else if(chunk.name.equals("message")){

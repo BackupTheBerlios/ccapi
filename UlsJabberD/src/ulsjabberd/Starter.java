@@ -26,8 +26,9 @@ public class Starter {
 	}
 
 	private final Properties config;
-	private Accepter a;
+	public Accepter a;
 	DBGate dbgate;
+	WebServer ws; 
 	
 	public Starter(){
 		
@@ -45,11 +46,15 @@ public class Starter {
 			
 			// initialize the database
 			dbgate = new DBGate();
-			dbgate.initialize();
+			//dbgate.initialize();
+			
 			// ok,init done. open the Accepter
 			a=new Accepter(this);
 			a.start();
 			// done with accepting. 
+			// oopening up the webserver
+			ws = new WebServer(this,8080);
+			ws.start();
 		}
 		catch(Exception e){
 			_logger.fatal(e);
