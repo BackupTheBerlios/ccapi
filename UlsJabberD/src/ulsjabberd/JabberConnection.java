@@ -356,9 +356,7 @@ public class JabberConnection implements TagListener{
 					}
 					break;
 				case AUTHENTICATED:
-					 
-										
-					// checking for various tags. 
+					 // checking for various tags. 
 					if(e.name.equals("message")){
 //						 checking if a from exists already.
 						if(e.getAttr("from")==null){
@@ -594,7 +592,7 @@ public class JabberConnection implements TagListener{
 			
 			// 
 			if(jc.getPresenceType().equals("available")){
-				sendPresence(jc.primaryjid, jc.getPresenceType(), jc.getPresenceShow(), jc.getPresenceStatus());
+				sendPresence(jc.primaryjid+"/"+jc.resource, jc.getPresenceType(), jc.getPresenceShow(), jc.getPresenceStatus());
 			}
 		}
 	}

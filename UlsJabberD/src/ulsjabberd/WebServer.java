@@ -99,6 +99,12 @@ public class WebServer extends Thread{
 		ret += ("<html>");
 		ret += ("<body>");
 		
+		ret += "<h2>Users online</h2>\n";
+		ret += "Count : "+this.s.a.connections.size()+"<br/>\n";
+		
+		ret += "<h2>Packets served</h2>\n";
+		ret += "Count : "+this.s.a.packetsserved+"<br/>\n";
+		
 		ret += ("<h1>Roster dump</h1>");
 		
 		Vector v = this.s.a.um.rosters;

@@ -16,9 +16,11 @@ public class TagHandlerWorkerThread extends Thread{
 		while(true){
 			try{
 				TagHandler th = a.popTagHandler();
+				
 				if(th == null)sleep(100);
 				else{
-					// work out tag handler. 
+					// work out tag handler.
+					a.packetsserved++;
 					th.handle();
 				}
 			}

@@ -30,6 +30,8 @@ public class Accepter extends Thread{
 	
 	XmlRouter xmlr;
 	
+	long packetsserved = 0;
+	
 	/**
 	 * plain constructor
 	 * @param s

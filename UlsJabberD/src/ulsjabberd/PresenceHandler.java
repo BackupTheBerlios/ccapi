@@ -11,9 +11,12 @@ package ulsjabberd;
 import ulsjabberd.xml.Element;
 import java.util.*;
 
+import org.apache.log4j.Logger;
+
 
 public class PresenceHandler implements TagHandler {
 
+	static Logger _logger = Logger.getLogger(PresenceHandler.class);
 	JabberConnection jc; 
 	Element presence;
 	
@@ -158,7 +161,16 @@ public class PresenceHandler implements TagHandler {
 				
 				// plain initial presence recieved ...
 				// or internal presence arrived 
-				  
+				
+				
+				// need to rewrite 
+				if(presence.getAttr("from")==null){
+					presence.attributes.put("from", jc.primaryjid+"/"+jc.resource);
+				}
+				if(presence.getAttr("from").indexOf("/")==-1){
+					presence.attributes.put("from", presence.getAttr("from")+"/"+jc.resource);
+				}
+				
 				if(presence.getElement("show")!=null){
 					jc.setPresenceShow(presence.getElement("show").getText());
 					jc.setPresenceType("available");
@@ -174,6 +186,7 @@ public class PresenceHandler implements TagHandler {
 					if(jc.getPresenceType().equals("unavailable")){
 						/// TODO: need to close the connection. 	
 						// TODO: need to do a presence push.
+						
 					}
 				}
 				else{
@@ -192,6 +205,7 @@ public class PresenceHandler implements TagHandler {
 				// now dispatching to buddys
 				for(int i=0;i<v.size();i++){
 					String s = (String)v.elementAt(i);
+					_logger.debug("Routing presence packet to "+s);
 					presence.attributes.put("to", s);
 					this.jc.a.xmlr.route(presence);
 				}
