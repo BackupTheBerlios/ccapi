@@ -9,6 +9,8 @@ CAUTION! In case of build errors:
 * modify build.xml to reflect your dev environment!
 * Especially jsse.jar is required (bundled with j2se1.4+) 
   and path to jsse.jar is set hard in build.xml
+
+CAUTION! Ignore warnings. 
 	
 (c) ulrich staudinger, 2002 - 2004, Giveaway under the hood of GPL.
 	</echo>

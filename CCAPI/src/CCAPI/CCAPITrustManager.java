@@ -6,6 +6,7 @@
  */
 package CCAPI;
 
+
 import javax.security.cert.X509Certificate;
 
 
@@ -21,29 +22,25 @@ import javax.security.cert.X509Certificate;
  */
 
 
-public class CCAPITrustManager implements javax.net.ssl.X509TrustManager{
-		CCAPITrustManager(){}
+public class CCAPITrustManager implements javax.net.ssl.X509TrustManager {
+    CCAPITrustManager() {}
 		
+    public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+        return null;
+    }
+
+    public void checkClientTrusted(
+            java.security.cert.X509Certificate[] certs, String authType) {}
+
+    public void checkServerTrusted(
+            java.security.cert.X509Certificate[] certs, String authType) {}
 		
-		public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-			return null;
-		}
-		public void checkClientTrusted(
-				java.security.cert.X509Certificate[] certs, String authType) {
-			
+    public boolean isServerTrusted(X509Certificate[] certs) {
+        return true;
+    }
 		
-		}
-		public void checkServerTrusted(
-				java.security.cert.X509Certificate[] certs, String authType) {
-			
-		}
-		
-		public boolean isServerTrusted(X509Certificate[] certs){
-			return true;
-		}
-		
-		public boolean isClientTrusted(X509Certificate[] certs){
-			return true;
-		}
+    public boolean isClientTrusted(X509Certificate[] certs) {
+        return true;
+    }
 
 }
