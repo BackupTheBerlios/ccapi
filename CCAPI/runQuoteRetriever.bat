@@ -1,0 +1,1 @@
+java -classpath bin;.\libs\log4j.jar;libs Examples.DataRetrievalFutureExample

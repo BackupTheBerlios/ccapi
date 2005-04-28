@@ -29,6 +29,17 @@ public class DataMirror {
 		}
 		connect();
 		
+		try {
+			Statement stmt = con2.createStatement();
+			String statement = "drop table symboldata;";
+			int i = stmt.executeUpdate(statement);
+			if (stmt != null)
+				stmt.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		
 		
 		try {
 			Statement stmt = con2.createStatement();
@@ -97,7 +108,7 @@ wkn        varchar(50)   latin1_swedish_ci  YES
 			con1 = DriverManager.getConnection(
 					"jdbc:mysql://localhost/jbossdb", "root", "");
 			con2 = DriverManager.getConnection(
-					"jdbc:mysql://localhost/target", "root", "");
+					"jdbc:mysql://localhost/usr_web485_1", "web485", "ljDdSnms");
 			
 			System.out.println("Database connected.");
 		} catch (SQLException ex) {
