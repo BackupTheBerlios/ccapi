@@ -18,7 +18,7 @@ CAUTION! Ignore warnings.
 (c) ulrich staudinger, 2002 - 2004, Giveaway under the hood of GPL.
 	</echo>
 
-	<property name="classpath" value="./libs/checkstyle-all-3.1.jar:./libs/commons-logging.jar:./libs/fit.jar:./libs/htmllexer.jar:./libs/htmlparser.jar:./libs/junit.jar:./libs/sax2.jar:./libs/thumbelina.jar"/>
+	<property name="classpath" value="./libs/activation.jar:./libs/mail.jar:./libs/checkstyle-all-3.1.jar:./libs/commons-logging.jar:./libs/fit.jar:./libs/htmllexer.jar:./libs/htmlparser.jar:./libs/junit.jar:./libs/sax2.jar:./libs/thumbelina.jar"/>
 
 
 	<!-- compile to local bin folder -->
